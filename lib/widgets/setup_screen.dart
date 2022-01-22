@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 
 class SetupScreen extends StatefulWidget {
-  const SetupScreen({ Key? key }) : super(key: key);
+  Function onEnd;
+  SetupScreen({ Key? key, required this.onEnd }) : super(key: key);
 
   @override
   _SetupScreenState createState() => _SetupScreenState();
@@ -14,9 +15,10 @@ class _SetupScreenState extends State<SetupScreen> {
       child: Column(
         children: [
           AppBar(),
+          Expanded(child: SizedBox(height: 1,)),
           Expanded(
             child: Container(
-              margin: EdgeInsets.only(top: 206, bottom: 250),
+              // margin: EdgeInsets.only(top: 206, bottom: 250),
               child: Row(
                 children: [
                   Expanded(
@@ -45,11 +47,12 @@ class _SetupScreenState extends State<SetupScreen> {
                               fontWeight: FontWeight.w600,
                               color: Color(0xFFD5D5D5),
                             ),
+                            textAlign: TextAlign.center,
                           ),
                           Expanded(child: SizedBox(height: 1,)),
                           SelectButton(
                             onPressed: () {
-                              
+                              widget.onEnd();
                             },
                           ),
                           SizedBox(height: 20,)
@@ -108,7 +111,7 @@ class _SetupScreenState extends State<SetupScreen> {
                           Expanded(child: SizedBox(height: 1,)),
                           SelectButton(
                             onPressed: () {
-                              
+                              widget.onEnd();
                             },
                           ),
                           SizedBox(height: 20,)
@@ -138,7 +141,8 @@ class _SetupScreenState extends State<SetupScreen> {
                 ],
               ),
             ),
-          )
+          ),
+          Expanded(child: SizedBox(height: 1,)),
         ],
       ),
 

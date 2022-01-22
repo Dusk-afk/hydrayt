@@ -35,9 +35,15 @@ void main() {
   });
 }
 
-class MainApp extends StatelessWidget {
+class MainApp extends StatefulWidget {
   const MainApp({Key? key}) : super(key: key);
 
+  @override
+  State<MainApp> createState() => _MainAppState();
+}
+
+class _MainAppState extends State<MainApp> {
+  bool showSetupScreen = true;
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -47,7 +53,18 @@ class MainApp extends StatelessWidget {
           TitleBar(),
           Expanded(
             child: Row(
-              children: [LeftBar(), Expanded(child: SetupScreen())],
+              children: [
+                LeftBar(),
+                Expanded(
+                  child: showSetupScreen? SetupScreen(
+                    onEnd: () {
+                      setState(() {
+                        showSetupScreen = false;
+                      });
+                    },
+                  ) : MainScreen()
+                )
+              ],
             ),
           ),
         ],
