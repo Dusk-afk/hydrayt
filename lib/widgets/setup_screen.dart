@@ -1,4 +1,9 @@
+import 'dart:convert';
+import 'dart:io';
+import 'dart:typed_data';
 import 'package:flutter/material.dart';
+import 'package:hydra_gui_app/data/token.dart';
+import 'package:path_provider/path_provider.dart';
 
 class SetupScreen extends StatefulWidget {
   Function onEnd;
@@ -51,9 +56,7 @@ class _SetupScreenState extends State<SetupScreen> {
                           ),
                           Expanded(child: SizedBox(height: 1,)),
                           SelectButton(
-                            onPressed: () {
-                              widget.onEnd();
-                            },
+                            onPressed: getUser,
                           ),
                           SizedBox(height: 20,)
                         ],
@@ -151,6 +154,42 @@ class _SetupScreenState extends State<SetupScreen> {
         borderRadius: BorderRadius.only(topLeft: Radius.circular(10)),
       )
     );
+  }
+
+  Future<User?> getUser() async {
+    // Get user name using temp dir
+    Directory path = await getTemporaryDirectory();
+    String windowsUserName = path.path.split("\\")[2];
+
+    // Using user name get discord local storage dir
+    String discordStoragePath = "C:\\Users\\$windowsUserName\\AppData\\Roaming\\discord\\Local Storage\\leveldb";
+
+    // Get all files in this dir
+    List<FileSystemEntity> files = Directory(discordStoragePath).listSync();
+
+    // Iterate through these files
+    for (FileSystemEntity file in files){
+
+      // Check if file ends with .log or .ldb
+      if (!file.path.endsWith(".log") && !file.path.endsWith(".ldb")){
+        // If not then go to another file
+        continue;
+      }
+
+      // Read the file and match the token re to look for possible tokens
+      String data = String.fromCharCodes(await File(file.path).readAsBytes());
+      RegExp regExp = RegExp(r"[\w-]{24}\.[\w-]{6}\.[\w-]{27}");
+
+      // Instantiate a user class using the token
+      User user = User.fromToken(regExp.stringMatch(data).toString());
+      await user.init();
+
+      // If the token is valid then return this user
+      if(user.isValid){
+        return user;
+      }
+    }
+    return null;
   }
 }
 
