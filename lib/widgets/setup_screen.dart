@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:ffi';
 import 'dart:io';
 import 'dart:typed_data';
 import 'package:flutter/material.dart';
@@ -13,8 +14,11 @@ class SetupScreen extends StatefulWidget {
   _SetupScreenState createState() => _SetupScreenState();
 }
 
-class _SetupScreenState extends State<SetupScreen> {
-  bool automaticOptionAvailable = true;
+class _SetupScreenState extends State<SetupScreen>  with SingleTickerProviderStateMixin {
+  bool _automaticOptionAvailable = true;
+  bool _manualOptionSelected = false;
+  bool _tokenTextFieldValidate = false;
+  TextEditingController tokenTextFieldController = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
@@ -61,8 +65,8 @@ class _SetupScreenState extends State<SetupScreen> {
                             onPressed: () {
                               handleButton(0);
                             },
-                            enabled: automaticOptionAvailable? true : false,
-                            text: automaticOptionAvailable? "Select" : "Unavailable",
+                            enabled: _automaticOptionAvailable? true : false,
+                            text: _automaticOptionAvailable? "Select" : "Unavailable",
                           ),
                           SizedBox(height: 20,)
                         ],
@@ -107,7 +111,61 @@ class _SetupScreenState extends State<SetupScreen> {
                             ),
                           ),
                           SizedBox(height: 13,),
-                          Text(
+                          _manualOptionSelected?
+                          Container(
+                            margin: EdgeInsets.symmetric(horizontal: 23),
+                            height: 35,
+                            child: TextField(
+                              controller: tokenTextFieldController,
+                              style: const TextStyle(
+                                color: Color(0xFF70747B),
+                                fontSize: 12,
+                                fontFamily: "segoe",
+                                fontWeight: FontWeight.w600,
+                              ),
+                              cursorColor: const Color(0xFF5E74FF),
+                              decoration: InputDecoration(
+                                focusColor: const Color(0xFF5E74FF),
+                                errorStyle: TextStyle(height: 0),
+                                errorText: _tokenTextFieldValidate? " " : null,
+                                hintText: "Enter Token",
+                                hintStyle: const TextStyle(
+                                  color: Color(0xFF70747B),
+                                  fontSize: 12,
+                                  fontFamily: "segoe",
+                                  fontWeight: FontWeight.w600,
+                                ),
+                                fillColor: Color(0xFF202225),
+                                filled: true,
+                                contentPadding: EdgeInsets.all(10.0),
+                                enabledBorder: OutlineInputBorder(
+                                  borderSide: const BorderSide(
+                                      color: Color(0xFF202225)
+                                  ),
+                                  borderRadius: BorderRadius.circular(5),
+                                ),
+                                focusedBorder: OutlineInputBorder(
+                                  borderSide: const BorderSide(
+                                      color: Color(0xFF5E74FF)
+                                  ),
+                                  borderRadius: BorderRadius.circular(5),
+                                ),
+                                errorBorder: OutlineInputBorder(
+                                  borderSide: const BorderSide(
+                                      color: Colors.red
+                                  ),
+                                  borderRadius: BorderRadius.circular(5),
+                                ),
+                                focusedErrorBorder: OutlineInputBorder(
+                                  borderSide: const BorderSide(
+                                      color: Colors.red
+                                  ),
+                                  borderRadius: BorderRadius.circular(5),
+                                ),
+                              ),
+                            ),
+                          ) :
+                          const Text(
                             "Manually type your discord Token\n(Ooooh such a pain)",
                             style: TextStyle(
                               fontSize: 12,
@@ -122,11 +180,12 @@ class _SetupScreenState extends State<SetupScreen> {
                             onPressed: () {
                               handleButton(1);
                             },
+                            text: _manualOptionSelected? "Go" : "Select",
                           ),
                           SizedBox(height: 20,)
                         ],
                       ),
-                      
+
                       decoration: const BoxDecoration(
                         borderRadius: BorderRadius.all(Radius.circular(10)),
                         gradient: LinearGradient(
@@ -163,6 +222,7 @@ class _SetupScreenState extends State<SetupScreen> {
   }
 
   handleButton(int option) async {
+    User? user;
     if (option == 0){
       showDialog(
           barrierDismissible: false,
@@ -170,52 +230,97 @@ class _SetupScreenState extends State<SetupScreen> {
           builder: (context) => SettingUpDialog()
       );
 
-      User? user = await getUser();
+      user = await getUserAutomatic();
       if (user == null){
         Navigator.pop(context);
         showDialog(
             barrierDismissible: false,
             context: context,
-            builder: (context) => UnableToFindTokenDialog()
+            builder: (context) => TokenErrorDialog(
+              title: "Unable To Find Token",
+              subTitle: "Enter Token Manually",
+              buttonText: "Dismiss",
+            )
         );
         setState(() {
-          automaticOptionAvailable = false;
+          _automaticOptionAvailable = false;
         });
         return null;
       }
-
-      // Getting Directory of user data
-      Directory userDir = Directory((await getApplicationDocumentsDirectory()).path + "\\HydraYTBot");
-
-      // If this directory doesn't exist then make one
-      if (!(await userDir.exists())){
-        userDir.create();
-      }
-
-      // Getting user file inside this directory
-      File userFile = File(userDir.path + "\\user.dk");
-
-      // If this file exists then delete it because we will create new file
-      if (await userFile.exists()){
-        userFile.delete();
-      }
-      userFile.create();
-
-      // Write the user file with token
-      userFile.writeAsString(user.token);
-
-      // Dismiss the dialog
-      Navigator.pop(context);
-
-      // Close the setup screen
-      widget.onEnd();
     }
     else if (option == 1) {
+      if (!_manualOptionSelected){
+        setState(() {
+          _manualOptionSelected = true;
+        });
+      }
 
+      else {
+        if (tokenTextFieldController.text.isEmpty){
+          setState(() {
+            _tokenTextFieldValidate = true;
+          });
+          return null;
+        }else{
+          setState(() {
+            _tokenTextFieldValidate = false;
+          });
+        }
+        showDialog(
+            barrierDismissible: false,
+            context: context,
+            builder: (context) => SettingUpDialog()
+        );
+
+        user = await getUserManual(tokenTextFieldController.text);
+        if (user == null) {
+          Navigator.pop(context);
+          showDialog(
+              barrierDismissible: false,
+              context: context,
+              builder: (context) =>
+                  TokenErrorDialog(
+                    title: "Token Invalid",
+                    subTitle: "Please Try Again",
+                    buttonText: "OK",
+                  )
+          );
+          return null;
+        }
+      }
+
+      if (user != null) {
+        // Getting Directory of user data
+        Directory userDir = Directory(
+            (await getApplicationDocumentsDirectory()).path + "\\HydraYTBot");
+
+        // If this directory doesn't exist then make one
+        if (!(await userDir.exists())) {
+          userDir.create();
+        }
+
+        // Getting user file inside this directory
+        File userFile = File(userDir.path + "\\user.dk");
+
+        // If this file exists then delete it because we will create new file
+        if (await userFile.exists()) {
+          userFile.delete();
+        }
+        userFile.create();
+
+        // Write the user file with token
+        userFile.writeAsString(user.token);
+
+        // Dismiss the dialog
+        Navigator.pop(context);
+
+        // Close the setup screen
+        widget.onEnd();
+      }
     }
   }
 
-  Future<User?> getUser() async {
+  Future<User?> getUserAutomatic() async {
     // Get user name using temp dir
     Directory path = await getTemporaryDirectory();
     String windowsUserName = path.path.split("\\")[2];
@@ -250,10 +355,25 @@ class _SetupScreenState extends State<SetupScreen> {
     }
     return null;
   }
+
+  Future<User?> getUserManual(String token) async {
+    User user = User.fromToken(token);
+    await user.init();
+
+    // If the token is valid then return this user
+    if(user.isValid){
+      return user;
+    }
+    return null;
+  }
 }
 
-class UnableToFindTokenDialog extends StatelessWidget {
-  const UnableToFindTokenDialog({Key? key}) : super(key: key);
+class TokenErrorDialog extends StatelessWidget {
+  String title;
+  String subTitle;
+  String buttonText;
+
+  TokenErrorDialog({Key? key, required this.title, required this.subTitle, required this.buttonText}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -265,9 +385,9 @@ class UnableToFindTokenDialog extends StatelessWidget {
           mainAxisSize: MainAxisSize.min,
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           children: [
-            const Text(
-              "Unable To Find Token",
-              style: TextStyle(
+            Text(
+              title,
+              style: const TextStyle(
                   color: Color(0xFFADADAD),
                   fontSize: 21,
                   fontFamily: "segoe",
@@ -275,9 +395,9 @@ class UnableToFindTokenDialog extends StatelessWidget {
               ),
             ),
             SizedBox(height: 5,),
-            const Text(
-              "Enter Token Manually",
-              style: TextStyle(
+            Text(
+              subTitle,
+              style: const TextStyle(
                   color: Color(0xFFADADAD),
                   fontSize: 13,
                   fontFamily: "segoe",
@@ -289,7 +409,7 @@ class UnableToFindTokenDialog extends StatelessWidget {
               onPressed: () {
                 Navigator.pop(context);
               },
-              text: "Dismiss",
+              text: buttonText,
             )
           ],
         ),
