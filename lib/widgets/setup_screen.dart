@@ -3,7 +3,7 @@ import 'dart:ffi';
 import 'dart:io';
 import 'dart:typed_data';
 import 'package:flutter/material.dart';
-import 'package:hydra_gui_app/data/token.dart';
+import 'package:hydra_gui_app/data/user.dart';
 import 'package:path_provider/path_provider.dart';
 
 class SetupScreen extends StatefulWidget {

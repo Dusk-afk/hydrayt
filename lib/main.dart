@@ -39,6 +39,8 @@ void main() {
 }
 
 class MainApp extends StatefulWidget {
+  static bool showSetupScreen = false;
+
   const MainApp({Key? key}) : super(key: key);
 
   @override
@@ -46,8 +48,6 @@ class MainApp extends StatefulWidget {
 }
 
 class _MainAppState extends State<MainApp> {
-  bool showSetupScreen = false;
-
   @override
   void initState() {
     super.initState();
@@ -60,9 +60,9 @@ class _MainAppState extends State<MainApp> {
 
     // If this directory doesn't exist then show setup screen
     if (!(await userDir.exists())){
-      print("Directory doesn't exist");
+      // print("Directory doesn't exist");
       setState(() {
-        showSetupScreen = true;
+        MainApp.showSetupScreen = true;
       });
       return;
     }
@@ -72,9 +72,9 @@ class _MainAppState extends State<MainApp> {
 
     // If this file doesn't exist then show setup screen
     if (!(await userFile.exists())){
-      print("File doesn't exist");
+      // print("File doesn't exist");
       setState(() {
-        showSetupScreen = true;
+        MainApp.showSetupScreen = true;
       });
       return;
     }
@@ -92,10 +92,10 @@ class _MainAppState extends State<MainApp> {
               children: [
                 LeftBar(),
                 Expanded(
-                  child: showSetupScreen? SetupScreen(
+                  child: MainApp.showSetupScreen? SetupScreen(
                     onEnd: () {
                       setState(() {
-                        showSetupScreen = false;
+                        MainApp.showSetupScreen = false;
                       });
                     },
                   ) : MainScreen()
