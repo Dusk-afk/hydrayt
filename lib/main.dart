@@ -46,7 +46,7 @@ class MainApp extends StatefulWidget {
 }
 
 class _MainAppState extends State<MainApp> {
-  bool showSetupScreen = true;
+  bool showSetupScreen = false;
 
   @override
   void initState() {
@@ -60,7 +60,10 @@ class _MainAppState extends State<MainApp> {
 
     // If this directory doesn't exist then show setup screen
     if (!(await userDir.exists())){
-      showSetupScreen = true;
+      print("Directory doesn't exist");
+      setState(() {
+        showSetupScreen = true;
+      });
       return;
     }
 
@@ -68,7 +71,13 @@ class _MainAppState extends State<MainApp> {
     File userFile = File(userDir.path + "\\user.dk");
 
     // If this file doesn't exist then show setup screen
-    showSetupScreen = !(await userFile.exists());
+    if (!(await userFile.exists())){
+      print("File doesn't exist");
+      setState(() {
+        showSetupScreen = true;
+      });
+      return;
+    }
   }
 
   @override
