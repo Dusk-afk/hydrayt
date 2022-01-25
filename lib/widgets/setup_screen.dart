@@ -56,12 +56,14 @@ class _SetupScreenState extends State<SetupScreen> {
                           ),
                           Expanded(child: SizedBox(height: 1,)),
                           SelectButton(
-                            onPressed: getUser,
+                            onPressed: () {
+                              handleButton(0);
+                            },
                           ),
                           SizedBox(height: 20,)
                         ],
                       ),
-                      
+
                       decoration: const BoxDecoration(
                         borderRadius: BorderRadius.all(Radius.circular(10)),
                         gradient: LinearGradient(
@@ -114,7 +116,7 @@ class _SetupScreenState extends State<SetupScreen> {
                           Expanded(child: SizedBox(height: 1,)),
                           SelectButton(
                             onPressed: () {
-                              widget.onEnd();
+                              handleButton(1);
                             },
                           ),
                           SizedBox(height: 20,)
@@ -154,6 +156,42 @@ class _SetupScreenState extends State<SetupScreen> {
         borderRadius: BorderRadius.only(topLeft: Radius.circular(10)),
       )
     );
+  }
+
+  handleButton(int option) async {
+    if (option == 0){
+      User? user = await getUser();
+      if (user == null){
+        // TODO: Show that token not found
+        return null;
+      }
+
+      // Getting Directory of user data
+      Directory userDir = Directory((await getApplicationDocumentsDirectory()).path + "\\HydraYTBot");
+
+      // If this directory doesn't exist then make one
+      if (!(await userDir.exists())){
+        userDir.create();
+      }
+
+      // Getting user file inside this directory
+      File userFile = File(userDir.path + "\\user.dk");
+
+      // If this file exists then delete it because we will create new file
+      if (await userFile.exists()){
+        userFile.delete();
+      }
+      userFile.create();
+
+      // Write the user file with token
+      userFile.writeAsString(user.token);
+
+      // Close the setup screen
+      widget.onEnd();
+    }
+    else if (option == 1) {
+
+    }
   }
 
   Future<User?> getUser() async {
