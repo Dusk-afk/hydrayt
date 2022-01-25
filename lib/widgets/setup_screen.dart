@@ -158,7 +158,7 @@ class _SetupScreenState extends State<SetupScreen>  with SingleTickerProviderSta
                                 ),
                                 focusedErrorBorder: OutlineInputBorder(
                                   borderSide: const BorderSide(
-                                      color: Colors.red
+                                      color: Color(0xFF5E74FF)
                                   ),
                                   borderRadius: BorderRadius.circular(5),
                                 ),
@@ -249,19 +249,19 @@ class _SetupScreenState extends State<SetupScreen>  with SingleTickerProviderSta
       }
     }
     else if (option == 1) {
-      if (!_manualOptionSelected){
+      if (!_manualOptionSelected) {
         setState(() {
           _manualOptionSelected = true;
         });
       }
 
       else {
-        if (tokenTextFieldController.text.isEmpty){
+        if (tokenTextFieldController.text.isEmpty) {
           setState(() {
             _tokenTextFieldValidate = true;
           });
           return null;
-        }else{
+        } else {
           setState(() {
             _tokenTextFieldValidate = false;
           });
@@ -288,35 +288,34 @@ class _SetupScreenState extends State<SetupScreen>  with SingleTickerProviderSta
           return null;
         }
       }
+    }
 
-      if (user != null) {
-        // Getting Directory of user data
-        Directory userDir = Directory(
-            (await getApplicationDocumentsDirectory()).path + "\\HydraYTBot");
+    if (user != null) {
+      // Getting Directory of user data
+      Directory userDir = Directory((await getApplicationDocumentsDirectory()).path + "\\HydraYTBot");
 
-        // If this directory doesn't exist then make one
-        if (!(await userDir.exists())) {
-          userDir.create();
-        }
-
-        // Getting user file inside this directory
-        File userFile = File(userDir.path + "\\user.dk");
-
-        // If this file exists then delete it because we will create new file
-        if (await userFile.exists()) {
-          userFile.delete();
-        }
-        userFile.create();
-
-        // Write the user file with token
-        userFile.writeAsString(user.token);
-
-        // Dismiss the dialog
-        Navigator.pop(context);
-
-        // Close the setup screen
-        widget.onEnd();
+      // If this directory doesn't exist then make one
+      if (!(await userDir.exists())) {
+        userDir.create();
       }
+
+      // Getting user file inside this directory
+      File userFile = File(userDir.path + "\\user.dk");
+
+      // If this file exists then delete it because we will create new file
+      if (await userFile.exists()) {
+        userFile.delete();
+      }
+      userFile.create();
+
+      // Write the user file with token
+      userFile.writeAsString(user.token);
+
+      // Dismiss the dialog
+      Navigator.pop(context);
+
+      // Close the setup screen
+      widget.onEnd();
     }
   }
 

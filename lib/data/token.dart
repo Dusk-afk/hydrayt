@@ -43,7 +43,6 @@ class User{
         "Authorization": token
       }
     );
-
     return jsonDecode(response.body);
   }
 }
