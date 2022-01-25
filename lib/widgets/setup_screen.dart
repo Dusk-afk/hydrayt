@@ -14,6 +14,8 @@ class SetupScreen extends StatefulWidget {
 }
 
 class _SetupScreenState extends State<SetupScreen> {
+  bool automaticOptionAvailable = true;
+
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -59,6 +61,8 @@ class _SetupScreenState extends State<SetupScreen> {
                             onPressed: () {
                               handleButton(0);
                             },
+                            enabled: automaticOptionAvailable? true : false,
+                            text: automaticOptionAvailable? "Select" : "Unavailable",
                           ),
                           SizedBox(height: 20,)
                         ],
@@ -160,9 +164,23 @@ class _SetupScreenState extends State<SetupScreen> {
 
   handleButton(int option) async {
     if (option == 0){
+      showDialog(
+          barrierDismissible: false,
+          context: context,
+          builder: (context) => SettingUpDialog()
+      );
+
       User? user = await getUser();
       if (user == null){
-        // TODO: Show that token not found
+        Navigator.pop(context);
+        showDialog(
+            barrierDismissible: false,
+            context: context,
+            builder: (context) => UnableToFindTokenDialog()
+        );
+        setState(() {
+          automaticOptionAvailable = false;
+        });
         return null;
       }
 
@@ -185,6 +203,9 @@ class _SetupScreenState extends State<SetupScreen> {
 
       // Write the user file with token
       userFile.writeAsString(user.token);
+
+      // Dismiss the dialog
+      Navigator.pop(context);
 
       // Close the setup screen
       widget.onEnd();
@@ -231,9 +252,113 @@ class _SetupScreenState extends State<SetupScreen> {
   }
 }
 
+class UnableToFindTokenDialog extends StatelessWidget {
+  const UnableToFindTokenDialog({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Dialog(
+      child: Container(
+        padding: EdgeInsets.symmetric(vertical: 15),
+
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+          children: [
+            const Text(
+              "Unable To Find Token",
+              style: TextStyle(
+                  color: Color(0xFFADADAD),
+                  fontSize: 21,
+                  fontFamily: "segoe",
+                  fontWeight: FontWeight.w600
+              ),
+            ),
+            SizedBox(height: 5,),
+            const Text(
+              "Enter Token Manually",
+              style: TextStyle(
+                  color: Color(0xFFADADAD),
+                  fontSize: 13,
+                  fontFamily: "segoe",
+                  // fontWeight: FontWeight.w600
+              ),
+            ),
+            SizedBox(height: 23,),
+            SelectButton(
+              onPressed: () {
+                Navigator.pop(context);
+              },
+              text: "Dismiss",
+            )
+          ],
+        ),
+
+        decoration: BoxDecoration(
+          color: Color(0xFF2F3136),
+          borderRadius: BorderRadius.all(Radius.circular(10)),
+        ),
+      ),
+      backgroundColor: Colors.transparent,
+      shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.all(Radius.circular(10))),
+    );
+  }
+}
+
+
+class SettingUpDialog extends StatelessWidget {
+  const SettingUpDialog({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Dialog(
+      child: Container(
+        padding: EdgeInsets.symmetric(vertical: 15),
+
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+          children: const [
+            Text(
+              "Setting Up",
+              style: TextStyle(
+                color: Color(0xFFADADAD),
+                fontSize: 21,
+                fontFamily: "segoe",
+                fontWeight: FontWeight.w600
+              ),
+            ),
+            SizedBox(
+              width: 20,
+              height: 20,
+              child: CircularProgressIndicator(
+                color: Color(0xFF5E74FF),
+                strokeWidth: 3,
+              ),
+            )
+          ],
+        ),
+
+        decoration: BoxDecoration(
+          color: Color(0xFF2F3136),
+          borderRadius: BorderRadius.all(Radius.circular(10)),
+        ),
+      ),
+      backgroundColor: Colors.transparent,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.all(Radius.circular(10))),
+    );
+  }
+}
+
+
 class SelectButton extends StatefulWidget {
   Function onPressed;
-  SelectButton({ Key? key, required this.onPressed }) : super(key: key);
+  String text;
+  bool enabled;
+
+  SelectButton({ Key? key, required this.onPressed, this.text = "Select", this.enabled = true }) : super(key: key);
 
   @override
   _SelectButtonState createState() => _SelectButtonState();
@@ -245,10 +370,10 @@ class _SelectButtonState extends State<SelectButton> {
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: () {
-        widget.onPressed();
+        widget.enabled? widget.onPressed() : () {};
       },
       child: MouseRegion(
-        cursor: SystemMouseCursors.click,
+        cursor: widget.enabled? SystemMouseCursors.click : SystemMouseCursors.basic,
         onEnter: (_) {
           setState(() {
             isHovered = true;
@@ -263,9 +388,9 @@ class _SelectButtonState extends State<SelectButton> {
           duration: Duration(milliseconds: 100),
           width: 166,
           height: 35,
-          child: const Center(
+          child: Center(
             child: Text(
-              "Select",
+              widget.text,
               style: TextStyle(
                 fontSize: 15,
                 fontFamily: "segoe",
@@ -276,14 +401,21 @@ class _SelectButtonState extends State<SelectButton> {
           ),
                                 
           decoration: BoxDecoration(
-            // color: isHovered? Color(0xFF2A3BF8) : Color(0xFF5865F2),
-            gradient: LinearGradient(
+            // color: widget.enabled? Colors.transparent : Color(0xFF403D3D),
+            gradient: widget.enabled? LinearGradient(
               begin: Alignment.topCenter,
               end: Alignment.bottomCenter,
               colors: [
                 Color(0xFF5865F2),
                 isHovered? Color(0xFF3B44A7) : Color(0xFF5865F2)
               ]
+            ) : LinearGradient(
+                begin: Alignment.topCenter,
+                end: Alignment.bottomCenter,
+                colors: [
+                  Color(0xFF403D3D),
+                  Color(0xFF403D3D),
+                ]
             ),
             borderRadius: const BorderRadius.all(Radius.circular(5))
           ),
