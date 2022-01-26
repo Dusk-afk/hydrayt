@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:hydra_gui_app/data/guild.dart';
 import 'package:hydra_gui_app/data/user.dart';
 import 'package:hydra_gui_app/main.dart';
+import 'package:hydra_gui_app/widgets/add_server_final_dialog.dart';
+import 'package:hydra_gui_app/widgets/add_server_manually_dialog.dart';
 import 'package:hydra_gui_app/widgets/select_button.dart';
 import 'package:http/http.dart' as http;
 
@@ -73,12 +75,18 @@ class _AddServerDialogState extends State<AddServerDialog> {
                       itemBuilder: (context, index) => ServerCard(
                         guild: Guild.currentUserGuilds[index],
                         onPressed: () {
-                          print("Tapped on : ${Guild.currentUserGuilds[index].name}");
+                          // Navigator.pop(context);
+                          showDialog(
+                            context: context,
+                            builder: (context) => AddServerFinalDialog(
+                              guild: Guild.currentUserGuilds[index]
+                            )
+                          );
                         },
                       ),
                     ),
                     constraints: BoxConstraints(
-                      maxHeight: 500,
+                      maxHeight: 300,
                     ),
                   );
                 }
@@ -87,7 +95,13 @@ class _AddServerDialogState extends State<AddServerDialog> {
 
             SizedBox(height: 30,),
             SelectButton(
-              onPressed: () {},
+              onPressed: () {
+                Navigator.pop(context);
+                showDialog(
+                  context: context,
+                  builder: (context) => AddServerManuallyDialog()
+                );
+              },
               text: "Add Manually",
             ),
             SizedBox(height: 20,)
@@ -132,7 +146,7 @@ class _ServerCardState extends State<ServerCard> {
               child: CachedNetworkImage(
                 width: 40,
                 height: 40,
-                imageUrl: "https://cdn.discordapp.com/icons/${widget.guild.id}/${widget.guild.icon}.webp",
+                imageUrl: "https://cdn.discordapp.com/icons/${widget.guild.id}/${widget.guild.icon}.webp?size=64",
                 placeholder: (context, url) => CircularProgressIndicator(
                   color: Color(0xFF5E74FF),
                   strokeWidth: 3,

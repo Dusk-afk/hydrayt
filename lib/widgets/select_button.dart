@@ -3,9 +3,11 @@ import 'package:flutter/material.dart';
 class SelectButton extends StatefulWidget {
   Function onPressed;
   String text;
+  double? width;
+  double? height;
   bool enabled;
 
-  SelectButton({ Key? key, required this.onPressed, this.text = "Select", this.enabled = true }) : super(key: key);
+  SelectButton({ Key? key, required this.onPressed, this.text = "Select", this.enabled = true, this.width, this.height}) : super(key: key);
 
   @override
   _SelectButtonState createState() => _SelectButtonState();
@@ -33,8 +35,8 @@ class _SelectButtonState extends State<SelectButton> {
         },
         child: AnimatedContainer(
           duration: Duration(milliseconds: 100),
-          width: 166,
-          height: 35,
+          width: widget.width??=166,
+          height: widget.height??=35,
           child: Center(
             child: Text(
               widget.text,
