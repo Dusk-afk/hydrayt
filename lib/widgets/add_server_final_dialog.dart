@@ -1,6 +1,11 @@
+import 'dart:convert';
+import 'dart:io';
+
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:hydra_gui_app/widgets/select_button.dart';
+import 'package:hydra_gui_app/widgets/setup_screen.dart';
+import 'package:path_provider/path_provider.dart';
 import '../data/guild.dart';
 
 class AddServerFinalDialog extends StatefulWidget {
@@ -184,7 +189,9 @@ class _AddServerFinalDialogState extends State<AddServerFinalDialog> {
               children: [
                 Expanded(child: SizedBox(width: 1,)),
                 SelectButton(
-                  onPressed: () {handleContinueButton();},
+                  onPressed: () {
+                    handleContinueButton();
+                  },
                   text: "Continue",
                   width: 100,
                 ),
@@ -220,7 +227,52 @@ class _AddServerFinalDialogState extends State<AddServerFinalDialog> {
     setState(() {
       _channelIdFieldValidate = false;
     });
+    addGuildToData(channelId);
+  }
 
-    // TODO: Add Server using this data
+  addGuildToData(String channelId) async {
+    showDialog(
+        barrierDismissible: false,
+        context: context,
+        builder: (context) => SettingUpDialog()
+    );
+
+    Directory userDir = Directory((await getApplicationDocumentsDirectory()).path + "\\HydraYTBot");
+    File guildsFile = File(userDir.path + "\\guilds.dk");
+
+    // Create this file if it doesn't exist
+    if (!(await guildsFile.exists())){
+      guildsFile.create();
+
+      String guildDetails = '{"id":"${widget.guild.id}", "name":"${widget.guild.name}", "icon":"${widget.guild.icon}", "channel_id":"${channelId}"}';
+      List<dynamic> payload = [guildDetails];
+      guildsFile.writeAsString(payload.toString());
+
+      Navigator.pop(context);
+      Navigator.pop(context);
+      Navigator.pop(context);
+
+      return;
+    }
+
+    dynamic fileData = await guildsFile.readAsString();
+    if (fileData.isEmpty){
+      fileData = "[]";
+    }
+
+    try {
+      fileData = jsonDecode(fileData);
+    }catch(e){
+      // File is probably corrupted
+      fileData = [];
+    }
+    String guildDetails = '{"id":"${widget.guild.id}", "name":"${widget.guild.name}", "icon":"${widget.guild.icon}", "channel_id":"${channelId}"}';
+    fileData.add(jsonDecode(guildDetails));
+
+    guildsFile.writeAsString(jsonEncode(fileData));
+
+    Navigator.pop(context);
+    Navigator.pop(context);
+    Navigator.pop(context);
   }
 }
