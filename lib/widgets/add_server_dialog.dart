@@ -9,7 +9,8 @@ import 'package:hydra_gui_app/widgets/select_button.dart';
 import 'package:http/http.dart' as http;
 
 class AddServerDialog extends StatefulWidget {
-  const AddServerDialog({Key? key}) : super(key: key);
+  Function reload;
+  AddServerDialog({Key? key, required this.reload}) : super(key: key);
 
   @override
   _AddServerDialogState createState() => _AddServerDialogState();
@@ -79,7 +80,8 @@ class _AddServerDialogState extends State<AddServerDialog> {
                           showDialog(
                             context: context,
                             builder: (context) => AddServerFinalDialog(
-                              guild: Guild.currentUserGuilds[index]
+                              guild: Guild.currentUserGuilds[index],
+                              reload: widget.reload,
                             )
                           );
                         },
@@ -99,7 +101,9 @@ class _AddServerDialogState extends State<AddServerDialog> {
                 Navigator.pop(context);
                 showDialog(
                   context: context,
-                  builder: (context) => AddServerManuallyDialog()
+                  builder: (context) => AddServerManuallyDialog(
+                    reload: widget.reload,
+                  )
                 );
               },
               text: "Add Manually",

@@ -8,7 +8,8 @@ import 'package:hydra_gui_app/widgets/setup_screen.dart';
 import 'package:path_provider/path_provider.dart';
 
 class AddServerManuallyDialog extends StatefulWidget {
-  const AddServerManuallyDialog({Key? key}) : super(key: key);
+  Function reload;
+  AddServerManuallyDialog({Key? key, required this.reload}) : super(key: key);
 
   @override
   _AddServerManuallyDialogState createState() => _AddServerManuallyDialogState();
@@ -325,6 +326,7 @@ class _AddServerManuallyDialogState extends State<AddServerManuallyDialog> {
 
       Navigator.pop(context);
       Navigator.pop(context);
+      widget.reload();
 
       return;
     }
@@ -347,5 +349,6 @@ class _AddServerManuallyDialogState extends State<AddServerManuallyDialog> {
 
     Navigator.pop(context);
     Navigator.pop(context);
+    widget.reload();
   }
 }

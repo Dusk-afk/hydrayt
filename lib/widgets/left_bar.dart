@@ -1,6 +1,9 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:hydra_gui_app/data/local_guild.dart';
 import 'package:hydra_gui_app/widgets/add_server_dialog.dart';
 import 'package:hydra_gui_app/widgets/server_button.dart';
+import 'package:hydra_gui_app/widgets/server_button_network.dart';
 
 import '../main.dart';
 
@@ -46,11 +49,37 @@ class _LeftBarState extends State<LeftBar> {
             ),
           ),
           SizedBox(height: 8,),
+          FutureBuilder(
+            future: LocalGuild.loadFromLocal(),
+            builder: (BuildContext context, AsyncSnapshot snapshot) {
+              if (snapshot.hasData){
+                return Expanded(
+                  child: ListView.builder(
+                    itemCount: snapshot.data.length,
+                    itemBuilder: (context, index) => Column(
+                      children: [
+                        ServerButtonNetwork(
+                          onPressed: () {},
+                          guild: snapshot.data[index],
+                        ),
+                        SizedBox(height: 8,),
+                      ],
+                    ),
+                  ),
+                );
+              }else{
+                return Container();
+              }
+            },
+          ),
+          SizedBox(height: 10,),
           ServerButton(
             onPressed: () {
               showDialog(
                 context: context,
-                builder: (context) => AddServerDialog()
+                builder: (context) => AddServerDialog(
+                  reload: () {setState(() {});},
+                )
               );
             },
             child: SizedBox(
@@ -61,7 +90,8 @@ class _LeftBarState extends State<LeftBar> {
                 color: Color(0xFF3BA55D),
               ),
             ),
-          )
+          ),
+          SizedBox(height: 15,),
         ],
       ),
     );

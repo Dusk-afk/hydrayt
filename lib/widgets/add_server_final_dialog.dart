@@ -10,7 +10,8 @@ import '../data/guild.dart';
 
 class AddServerFinalDialog extends StatefulWidget {
   Guild guild;
-  AddServerFinalDialog({Key? key, required this.guild}) : super(key: key);
+  Function reload;
+  AddServerFinalDialog({Key? key, required this.guild, required this.reload}) : super(key: key);
 
   @override
   _AddServerFinalDialogState createState() => _AddServerFinalDialogState();
@@ -252,6 +253,8 @@ class _AddServerFinalDialogState extends State<AddServerFinalDialog> {
       Navigator.pop(context);
       Navigator.pop(context);
 
+      widget.reload();
+
       return;
     }
 
@@ -274,5 +277,7 @@ class _AddServerFinalDialogState extends State<AddServerFinalDialog> {
     Navigator.pop(context);
     Navigator.pop(context);
     Navigator.pop(context);
+
+    widget.reload();
   }
 }
