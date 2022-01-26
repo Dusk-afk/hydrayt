@@ -28,7 +28,13 @@ class _ServerButtonState extends State<ServerButton> {
         });
       },
       child: GestureDetector(
-        onTap: widget.enabled? widget.onPressed() : () {},
+        onTap: () {
+          if (widget.enabled){
+            widget.onPressed();
+          }else{
+
+          }
+        },
         child: AnimatedContainer(
           width: 48,
           height: 48,

@@ -4,6 +4,7 @@ import 'dart:io';
 
 import 'package:bitsdojo_window/bitsdojo_window.dart';
 import 'package:flutter/material.dart';
+import 'package:hydra_gui_app/data/user.dart';
 import 'package:hydra_gui_app/widgets/left_bar.dart';
 import 'package:hydra_gui_app/widgets/main_screen.dart';
 import 'package:hydra_gui_app/widgets/setup_screen.dart';
@@ -40,8 +41,9 @@ void main() {
 
 class MainApp extends StatefulWidget {
   static bool showSetupScreen = false;
+  static User? currentUser;
 
-  const MainApp({Key? key}) : super(key: key);
+  MainApp({Key? key}) : super(key: key);
 
   @override
   State<MainApp> createState() => _MainAppState();
@@ -78,6 +80,14 @@ class _MainAppState extends State<MainApp> {
       });
       return;
     }
+
+    MainApp.currentUser = await getUser(userFile);
+    if (MainApp.currentUser == null){
+      setState(() {
+        MainApp.showSetupScreen = true;
+      });
+      return;
+    }
   }
 
   @override
@@ -106,5 +116,12 @@ class _MainAppState extends State<MainApp> {
         ],
       ),
     );
+  }
+
+  Future<User?> getUser(File userFile) async {
+    String token = await userFile.readAsString();
+    User user = User.fromToken(token);
+    await user.init();
+    return user.isValid? user : null;
   }
 }

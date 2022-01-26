@@ -4,6 +4,7 @@ import 'dart:io';
 import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:hydra_gui_app/data/user.dart';
+import 'package:hydra_gui_app/widgets/select_button.dart';
 import 'package:path_provider/path_provider.dart';
 
 class SetupScreen extends StatefulWidget {
@@ -467,79 +468,6 @@ class SettingUpDialog extends StatelessWidget {
       backgroundColor: Colors.transparent,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.all(Radius.circular(10))),
-    );
-  }
-}
-
-
-class SelectButton extends StatefulWidget {
-  Function onPressed;
-  String text;
-  bool enabled;
-
-  SelectButton({ Key? key, required this.onPressed, this.text = "Select", this.enabled = true }) : super(key: key);
-
-  @override
-  _SelectButtonState createState() => _SelectButtonState();
-}
-
-class _SelectButtonState extends State<SelectButton> {
-  bool isHovered = false;
-  @override
-  Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: () {
-        widget.enabled? widget.onPressed() : () {};
-      },
-      child: MouseRegion(
-        cursor: widget.enabled? SystemMouseCursors.click : SystemMouseCursors.basic,
-        onEnter: (_) {
-          setState(() {
-            isHovered = true;
-          });
-        },
-        onExit: (_) {
-          setState(() {
-            isHovered = false;
-          });
-        },
-        child: AnimatedContainer(
-          duration: Duration(milliseconds: 100),
-          width: 166,
-          height: 35,
-          child: Center(
-            child: Text(
-              widget.text,
-              style: TextStyle(
-                fontSize: 15,
-                fontFamily: "segoe",
-                fontWeight: FontWeight.w600,
-                color: Color(0xFFD5D5D5),
-              ),
-            ),
-          ),
-                                
-          decoration: BoxDecoration(
-            // color: widget.enabled? Colors.transparent : Color(0xFF403D3D),
-            gradient: widget.enabled? LinearGradient(
-              begin: Alignment.topCenter,
-              end: Alignment.bottomCenter,
-              colors: [
-                Color(0xFF5865F2),
-                isHovered? Color(0xFF3B44A7) : Color(0xFF5865F2)
-              ]
-            ) : LinearGradient(
-                begin: Alignment.topCenter,
-                end: Alignment.bottomCenter,
-                colors: [
-                  Color(0xFF403D3D),
-                  Color(0xFF403D3D),
-                ]
-            ),
-            borderRadius: const BorderRadius.all(Radius.circular(5))
-          ),
-        ),
-      ),
     );
   }
 }

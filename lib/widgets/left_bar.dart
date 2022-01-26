@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:hydra_gui_app/widgets/add_server_dialog.dart';
 import 'package:hydra_gui_app/widgets/server_button.dart';
 
 import '../main.dart';
@@ -42,6 +43,23 @@ class _LeftBarState extends State<LeftBar> {
             decoration: BoxDecoration(
               color: Color(0xFF2D2F32),
               borderRadius: BorderRadius.all(Radius.circular(100))
+            ),
+          ),
+          SizedBox(height: 8,),
+          ServerButton(
+            onPressed: () {
+              showDialog(
+                context: context,
+                builder: (context) => AddServerDialog()
+              );
+            },
+            child: SizedBox(
+              width: 16,
+              height: 16,
+              child: Icon(
+                Icons.add,
+                color: Color(0xFF3BA55D),
+              ),
             ),
           )
         ],
