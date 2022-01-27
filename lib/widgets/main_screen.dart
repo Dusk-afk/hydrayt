@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:hydra_gui_app/widgets/server_button_network.dart';
 
 class MainScreen extends StatelessWidget {
   const MainScreen({ Key? key }) : super(key: key);
@@ -9,16 +10,29 @@ class MainScreen extends StatelessWidget {
       width: double.infinity,
       height: double.infinity,
 
-      child: Center(
-        child: Text(
-          "Main Screen",
-          style: TextStyle(
-            color: Colors.white,
-            fontFamily: "segoe",
-            fontSize: 32,
-            fontWeight: FontWeight.w600
+      child: Column(
+        mainAxisSize: MainAxisSize.max,
+        children: [
+          Expanded(child: SizedBox(height: 1,)),
+          Center(
+            child: Text(
+              "Main Screen",
+              style: TextStyle(
+                color: Colors.white,
+                fontFamily: "segoe",
+                fontSize: 32,
+                fontWeight: FontWeight.w600
+              ),
+            )
           ),
-        )
+          TextButton(
+            onPressed: () {
+              print(ServerButtonNetwork.currentSelected!.name);
+            },
+            child: Text("Current Server"),
+          ),
+          Expanded(child: SizedBox(height: 1,)),
+        ],
       ),
 
       decoration: BoxDecoration(

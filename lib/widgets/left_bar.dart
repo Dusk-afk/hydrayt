@@ -15,6 +15,10 @@ class LeftBar extends StatefulWidget {
 }
 
 class _LeftBarState extends State<LeftBar> {
+  void reload() {
+    setState(() {});
+  }
+
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -60,7 +64,9 @@ class _LeftBarState extends State<LeftBar> {
                       children: [
                         ServerButtonNetwork(
                           onPressed: () {},
+                          reload: reload,
                           guild: snapshot.data[index],
+                          index: index,
                         ),
                         SizedBox(height: 8,),
                       ],
