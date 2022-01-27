@@ -78,6 +78,7 @@ class _AddServerDialogState extends State<AddServerDialog> {
                         onPressed: () {
                           // Navigator.pop(context);
                           showDialog(
+                            barrierColor: Colors.transparent,
                             context: context,
                             builder: (context) => AddServerFinalDialog(
                               guild: Guild.currentUserGuilds[index],

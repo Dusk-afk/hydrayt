@@ -47,7 +47,13 @@ class _AddServerManuallyDialogState extends State<AddServerManuallyDialog> {
                       ),
                     ),
                     TextButton(
-                      onPressed: () {},
+                      onPressed: () {
+                        showDialog(
+                          barrierColor: Colors.transparent,
+                          context: context,
+                          builder: (context) => SetupStep1Dialog()
+                        );
+                      },
                       child: Text(
                         "First Time?",
                         style: TextStyle(
@@ -96,7 +102,13 @@ class _AddServerManuallyDialogState extends State<AddServerManuallyDialog> {
                     ),
                   ),
                   TextButton(
-                    onPressed: () {},
+                    onPressed: () {
+                      showDialog(
+                        barrierColor: Colors.transparent,
+                        context: context,
+                        builder: (context) => SetupStep2Dialog()
+                      );
+                    },
                     child: const Text(
                       "?",
                       style: TextStyle(
@@ -170,7 +182,13 @@ class _AddServerManuallyDialogState extends State<AddServerManuallyDialog> {
                     ),
                   ),
                   TextButton(
-                    onPressed: () {},
+                    onPressed: () {
+                      showDialog(
+                        barrierColor: Colors.transparent,
+                        context: context,
+                        builder: (context) => SetupStep3Dialog()
+                      );
+                    },
                     child: const Text(
                       "?",
                       style: TextStyle(
@@ -350,5 +368,339 @@ class _AddServerManuallyDialogState extends State<AddServerManuallyDialog> {
     Navigator.pop(context);
     Navigator.pop(context);
     widget.reload();
+  }
+}
+
+class SetupStep1Dialog extends StatelessWidget {
+  const SetupStep1Dialog({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Dialog(
+      child: Container(
+        width: 728,
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            SizedBox(height: 10,),
+            Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Expanded(child: SizedBox(width: 1,)),
+                Text(
+                  "Enable Developer Mode",
+                  style: TextStyle(
+                      color: Color(0xFFADADAD),
+                      fontFamily: "segoe",
+                      fontWeight: FontWeight.w600,
+                      fontSize: 17
+                  ),
+                ),
+                Expanded(child: SizedBox(width: 1,)),
+                IconButton(
+                  onPressed: () {
+                    Navigator.pop(context);
+                  },
+                  icon: Icon(
+                    Icons.close,
+                    color: Color(0xFFADADAD),
+                    size: 20,
+                  ),
+                  highlightColor: Colors.transparent,
+                  splashColor: Colors.transparent,
+                )
+              ],
+            ),
+            SizedBox(height: 30,),
+            const Text(
+              "           1) Open discord settings",
+              style: TextStyle(
+                  color: Color(0xFFADADAD),
+                  fontFamily: "segoe",
+                  // fontWeight: FontWeight.w600,
+                  fontSize: 19
+              ),
+            ),
+            const SizedBox(height: 16,),
+            const Text(
+              "           2) Go to advanced and enable Developer Mode",
+              style: TextStyle(
+                  color: Color(0xFFADADAD),
+                  fontFamily: "segoe",
+                  // fontWeight: FontWeight.w600,
+                  fontSize: 19
+              ),
+            ),
+            SizedBox(height: 25,),
+            Container(
+              margin: EdgeInsets.symmetric(horizontal: 56),
+              clipBehavior: Clip.antiAliasWithSaveLayer,
+              child: Image.asset("assets/setup_step_1.png"),
+              decoration: BoxDecoration(
+                  borderRadius: BorderRadius.all(Radius.circular(6)),
+                  boxShadow: [
+                    BoxShadow(
+                        color: Color.fromARGB(50, 0, 0, 0),
+                        blurRadius: 5,
+                        offset: Offset(0, 5)
+                    )
+                  ]
+              ),
+            ),
+
+            SizedBox(height: 30,),
+            Row(
+              children: [
+                Expanded(child: SizedBox(width: 1,)),
+                SelectButton(
+                  onPressed: () {
+                    Navigator.pop(context);
+                    showDialog(
+                        barrierColor: Colors.transparent,
+                        context: context,
+                        builder: (context) => SetupStep2Dialog()
+                    );
+                  },
+                  text: "Next",
+                  width: 88,
+                ),
+                SizedBox(width: 25,)
+              ],
+            ),
+            SizedBox(height: 20,)
+          ],
+        ),
+
+        decoration: BoxDecoration(
+          color: Color(0xFF2F3136),
+          borderRadius: BorderRadius.all(Radius.circular(10)),
+        ),
+      ),
+      backgroundColor: Colors.transparent,
+      shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.all(Radius.circular(10))),
+    );
+  }
+}
+
+class SetupStep2Dialog extends StatelessWidget {
+  const SetupStep2Dialog({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Dialog(
+      child: Container(
+        width: 728,
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            SizedBox(height: 10,),
+            Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                const Expanded(child: SizedBox(width: 1,)),
+                const Text(
+                  "Get Channel ID",
+                  style: TextStyle(
+                      color: Color(0xFFADADAD),
+                      fontFamily: "segoe",
+                      fontWeight: FontWeight.w600,
+                      fontSize: 17
+                  ),
+                ),
+                Expanded(child: SizedBox(width: 1,)),
+                IconButton(
+                  onPressed: () {
+                    Navigator.pop(context);
+                  },
+                  icon: const Icon(
+                    Icons.close,
+                    color: Color(0xFFADADAD),
+                    size: 20,
+                  ),
+                  highlightColor: Colors.transparent,
+                  splashColor: Colors.transparent,
+                )
+              ],
+            ),
+            const SizedBox(height: 30,),
+            const Text(
+              "           1) Right-click on the text channel where Hydra responds",
+              style: TextStyle(
+                  color: Color(0xFFADADAD),
+                  fontFamily: "segoe",
+                  // fontWeight: FontWeight.w600,
+                  fontSize: 19
+              ),
+            ),
+            const SizedBox(height: 16,),
+            const Text(
+              "           2) Click on Copy ID",
+              style: TextStyle(
+                  color: Color(0xFFADADAD),
+                  fontFamily: "segoe",
+                  // fontWeight: FontWeight.w600,
+                  fontSize: 19
+              ),
+            ),
+            SizedBox(height: 25,),
+            Container(
+              margin: EdgeInsets.symmetric(horizontal: 56),
+              clipBehavior: Clip.antiAliasWithSaveLayer,
+              child: Image.asset("assets/setup_step_2.png"),
+              decoration: BoxDecoration(
+                  borderRadius: BorderRadius.all(Radius.circular(6)),
+                  boxShadow: [
+                    BoxShadow(
+                        color: Color.fromARGB(50, 0, 0, 0),
+                        blurRadius: 5,
+                        offset: Offset(0, 5)
+                    )
+                  ]
+              ),
+            ),
+
+            SizedBox(height: 30,),
+            Row(
+              children: [
+                Expanded(child: SizedBox(width: 1,)),
+                SelectButton(
+                  onPressed: () {
+                    Navigator.pop(context);
+                    showDialog(
+                        barrierColor: Colors.transparent,
+                        context: context,
+                        builder: (context) => SetupStep3Dialog()
+                    );
+                  },
+                  text: "Next",
+                  width: 88,
+                ),
+                SizedBox(width: 25,)
+              ],
+            ),
+            SizedBox(height: 20,)
+          ],
+        ),
+
+        decoration: BoxDecoration(
+          color: Color(0xFF2F3136),
+          borderRadius: BorderRadius.all(Radius.circular(10)),
+        ),
+      ),
+      backgroundColor: Colors.transparent,
+      shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.all(Radius.circular(10))),
+    );
+  }
+}
+
+class SetupStep3Dialog extends StatelessWidget {
+  const SetupStep3Dialog({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Dialog(
+      child: Container(
+        width: 728,
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            SizedBox(height: 10,),
+            Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Expanded(child: SizedBox(width: 1,)),
+                Text(
+                  "How to get Server ID?",
+                  style: TextStyle(
+                      color: Color(0xFFADADAD),
+                      fontFamily: "segoe",
+                      fontWeight: FontWeight.w600,
+                      fontSize: 17
+                  ),
+                ),
+                Expanded(child: SizedBox(width: 1,)),
+                IconButton(
+                  onPressed: () {
+                    Navigator.pop(context);
+                  },
+                  icon: Icon(
+                    Icons.close,
+                    color: Color(0xFFADADAD),
+                    size: 20,
+                  ),
+                  highlightColor: Colors.transparent,
+                  splashColor: Colors.transparent,
+                )
+              ],
+            ),
+            SizedBox(height: 30,),
+            const Text(
+              "           1) Right-click on the server",
+              style: TextStyle(
+                  color: Color(0xFFADADAD),
+                  fontFamily: "segoe",
+                  // fontWeight: FontWeight.w600,
+                  fontSize: 19
+              ),
+            ),
+            const SizedBox(height: 16,),
+            const Text(
+              "           2) Click on Copy ID",
+              style: TextStyle(
+                  color: Color(0xFFADADAD),
+                  fontFamily: "segoe",
+                  // fontWeight: FontWeight.w600,
+                  fontSize: 19
+              ),
+            ),
+            SizedBox(height: 25,),
+            Container(
+              margin: EdgeInsets.symmetric(horizontal: 56),
+              clipBehavior: Clip.antiAliasWithSaveLayer,
+              child: Image.asset("assets/setup_step_1.png"),
+              decoration: BoxDecoration(
+                  borderRadius: BorderRadius.all(Radius.circular(6)),
+                  boxShadow: [
+                    BoxShadow(
+                        color: Color.fromARGB(50, 0, 0, 0),
+                        blurRadius: 5,
+                        offset: Offset(0, 5)
+                    )
+                  ]
+              ),
+            ),
+
+            SizedBox(height: 30,),
+            Row(
+              children: [
+                Expanded(child: SizedBox(width: 1,)),
+                SelectButton(
+                  onPressed: () {
+                    Navigator.pop(context);
+                  },
+                  text: "Done",
+                  width: 88,
+                ),
+                SizedBox(width: 25,)
+              ],
+            ),
+            SizedBox(height: 20,)
+          ],
+        ),
+
+        decoration: BoxDecoration(
+          color: Color(0xFF2F3136),
+          borderRadius: BorderRadius.all(Radius.circular(10)),
+        ),
+      ),
+      backgroundColor: Colors.transparent,
+      shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.all(Radius.circular(10))),
+    );
   }
 }
