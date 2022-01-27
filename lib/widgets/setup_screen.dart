@@ -7,6 +7,8 @@ import 'package:hydra_gui_app/data/user.dart';
 import 'package:hydra_gui_app/widgets/select_button.dart';
 import 'package:path_provider/path_provider.dart';
 
+import '../main.dart';
+
 class SetupScreen extends StatefulWidget {
   Function onEnd;
   SetupScreen({ Key? key, required this.onEnd }) : super(key: key);
@@ -316,6 +318,7 @@ class _SetupScreenState extends State<SetupScreen>  with SingleTickerProviderSta
       Navigator.pop(context);
 
       // Close the setup screen
+      MainApp.currentUser = user;
       widget.onEnd();
     }
   }

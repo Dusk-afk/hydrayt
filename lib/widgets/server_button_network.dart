@@ -1,5 +1,6 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:hydra_gui_app/data/guild.dart';
 import '../data/local_guild.dart';
 
 class ServerButtonNetwork extends StatefulWidget {
@@ -22,102 +23,98 @@ class _ServerButtonNetworkState extends State<ServerButtonNetwork> {
   bool _hovered = false;
   @override
   Widget build(BuildContext context) {
-    return Container(
-      // width: double.infinity,
-      // color: Colors.amber,
-      child: Row(
-        children: [
-          AnimatedContainer(
-            duration: Duration(milliseconds: 100),
-            width: 4,
-            height: ServerButtonNetwork.currentSelected == null? _hovered? 16 : 0 : ServerButtonNetwork.currentSelected!.id == widget.guild.id? 40 : _hovered? 16 : 0,
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.only(
-                topRight: Radius.circular(3),
-                bottomRight: Radius.circular(3),
-              )
-            ),
+    return Row(
+      children: [
+        AnimatedContainer(
+          duration: Duration(milliseconds: 100),
+          width: 4,
+          height: ServerButtonNetwork.currentSelected == null? _hovered? 16 : 0 : ServerButtonNetwork.currentSelected!.id == widget.guild.id? 40 : _hovered? 16 : 0,
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.only(
+              topRight: Radius.circular(3),
+              bottomRight: Radius.circular(3),
+            )
           ),
-          SizedBox(width: 8,),
-          MouseRegion(
-            cursor: widget.enabled? SystemMouseCursors.click : SystemMouseCursors.basic,
-            onEnter: (_) {
-              setState(() {
-                _hovered = true;
-              });
-            },
-            onExit: (_) {
-              setState(() {
-                _hovered = false;
-              });
-            },
-            child: GestureDetector(
-                onTap: () {
-                  setState(() {
-                    if (ServerButtonNetwork.currentSelected != widget.guild){
-                      ServerButtonNetwork.currentSelected = widget.guild;
-                      widget.reload();
-                    }
-                  });
-                  if (widget.enabled){
-                    widget.onPressed();
-                  }else{
-
+        ),
+        SizedBox(width: 8,),
+        MouseRegion(
+          cursor: widget.enabled? SystemMouseCursors.click : SystemMouseCursors.basic,
+          onEnter: (_) {
+            setState(() {
+              _hovered = true;
+            });
+          },
+          onExit: (_) {
+            setState(() {
+              _hovered = false;
+            });
+          },
+          child: GestureDetector(
+              onTap: () {
+                setState(() {
+                  if (ServerButtonNetwork.currentSelected != widget.guild){
+                    ServerButtonNetwork.currentSelected = widget.guild;
+                    widget.reload();
                   }
-                },
-                child: AnimatedContainer(
+                });
+                if (widget.enabled){
+                  widget.onPressed();
+                }else{
+
+                }
+              },
+              child: AnimatedContainer(
+                width: 48,
+                height: 48,
+                duration: Duration(milliseconds: 100),
+
+                clipBehavior: Clip.antiAliasWithSaveLayer,
+
+                child: CachedNetworkImage(
                   width: 48,
                   height: 48,
-                  duration: Duration(milliseconds: 100),
-
-                  clipBehavior: Clip.antiAliasWithSaveLayer,
-
-                  child: CachedNetworkImage(
-                    width: 48,
-                    height: 48,
-                    imageUrl: "https://cdn.discordapp.com/icons/${widget.guild.id}/${widget.guild.icon}.webp?size=64",
-                    placeholder: (context, url) => CircularProgressIndicator(
-                      color: Color(0xFF5E74FF),
-                      strokeWidth: 3,
-                    ),
-                    errorWidget: (context, url, error) => Container(
-                      child: Center(
-                        child: Text(
-                          widget.guild.name[0],
-                          style: TextStyle(
-                            fontSize: 16,
-                            color: Color(0xFFD7D9DA),
-                            fontFamily: "segoe"
-                          ),
+                  imageUrl: "https://cdn.discordapp.com/icons/${widget.guild.id}/${widget.guild.icon}.webp?size=64",
+                  placeholder: (context, url) => CircularProgressIndicator(
+                    color: Color(0xFF5E74FF),
+                    strokeWidth: 3,
+                  ),
+                  errorWidget: (context, url, error) => Container(
+                    child: Center(
+                      child: Text(
+                        widget.guild.name[0],
+                        style: TextStyle(
+                          fontSize: 16,
+                          color: Color(0xFFD7D9DA),
+                          fontFamily: "segoe"
                         ),
                       ),
                     ),
                   ),
+                ),
 
-                  decoration: BoxDecoration(
-                    color: Color(0xFF36393F),
-                    borderRadius: BorderRadius.all(  //widget.enabled? (_hovered? 18 : 25) : 25)
-                      Radius.circular(
-                        widget.enabled?
-                          ServerButtonNetwork.currentSelected == null?
+                decoration: BoxDecoration(
+                  color: Color(0xFF36393F),
+                  borderRadius: BorderRadius.all(  //widget.enabled? (_hovered? 18 : 25) : 25)
+                    Radius.circular(
+                      widget.enabled?
+                        ServerButtonNetwork.currentSelected == null?
+                          _hovered?
+                            18 : 25
+                          :
+                          ServerButtonNetwork.currentSelected!.id == widget.guild.id?
+                            18 :
                             _hovered?
                               18 : 25
-                            :
-                            ServerButtonNetwork.currentSelected!.id == widget.guild.id?
-                              18 :
-                              _hovered?
-                                18 : 25
-                          :
-                          25
-                      )
+                        :
+                        25
                     )
-                  ),
-                )
-            ),
+                  )
+                ),
+              )
           ),
-        ],
-      ),
+        ),
+      ],
     );
   }
 }

@@ -1,6 +1,10 @@
 import 'dart:convert';
+import 'dart:io';
+import 'dart:ui';
 
+import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:path_provider/path_provider.dart';
 
 class User{
   String token;
@@ -9,7 +13,18 @@ class User{
   late String id;
   late String username;
   late String discriminator;
-  late String email;
+  late String avatar;
+  late String bio;
+  late String bannerColor;
+
+  static Future<User?> getCurrentUser() async {
+    Directory userDir = Directory((await getApplicationDocumentsDirectory()).path + "\\HydraYTBot");
+    File userFile = File(userDir.path + "\\user.dk");
+    String token = await userFile.readAsString();
+    User user = User.fromToken(token);
+    await user.init();
+    return user.isValid? user : null;
+  }
 
   User.fromToken(this.token){
     // init();
@@ -21,7 +36,9 @@ class User{
       id = data["id"];
       username = data["username"];
       discriminator = data["discriminator"];
-      email = data["email"];
+      avatar = data["avatar"];
+      bio = data["bio"];
+      bannerColor = data["banner_color"];
 
       isValid = true;
 
@@ -45,5 +62,33 @@ class User{
     );
 
     return jsonDecode(response.body);
+  }
+
+  Color getColor(){
+    return Color(int.parse("0xFF${bannerColor.toString().substring(1)}"));
+  }
+
+  String getSafeBio(){
+    if ("\n".allMatches(bio).length > 5){
+      int currentIndex = 0;
+      for (int i in List<int>.generate(5, (i) => i)){
+        currentIndex = bio.indexOf("\n", currentIndex+1);
+      }
+      return bio.substring(0, currentIndex);
+    }else{
+      return bio;
+    }
+  }
+
+  Map<String, dynamic> getJson() {
+    return {
+      "id":id,
+      "name":username,
+      "discriminator":discriminator,
+      "token":token,
+      "avatar":avatar,
+      "bio":bio,
+      "bannerColor":bannerColor
+    };
   }
 }
