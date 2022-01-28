@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:hydra_gui_app/main.dart';
 import 'package:hydra_gui_app/widgets/select_button.dart';
 import 'package:hydra_gui_app/widgets/server_button_network.dart';
+import 'package:hydra_gui_app/widgets/setup_screen.dart';
 import 'package:hydra_gui_app/widgets/simple_dialog.dart';
 import 'package:youtube_explode_dart/youtube_explode_dart.dart';
 import 'package:http/http.dart' as http;
@@ -196,6 +197,25 @@ class VideoCard extends StatelessWidget {
   }
 
   void playButtonHandler() async {
+    if (ServerButtonNetwork.currentSelected == null){
+      showDialog(
+          context: context,
+          builder: (context) => CustomSimpleDialog(
+            title: "Where To Play?",
+            subTitle: "Please select a server first",
+            buttonText: "Got it",
+          )
+      );
+      return;
+    }
+
+    showDialog(
+      context: context,
+      builder: (context) => SettingUpDialog(
+        text: "Sending Request",
+      )
+    );
+
     // Obtain Streaming Url
     YoutubeExplode yt = YoutubeExplode();
     StreamManifest streamManifest = await yt.videos.streamsClient.getManifest(video.id);
@@ -203,20 +223,8 @@ class VideoCard extends StatelessWidget {
     String streamingUrl = audios[audios.length - 1].url.toString();
     yt.close();
 
-    if (ServerButtonNetwork.currentSelected == null){
-      showDialog(
-        context: context,
-        builder: (context) => CustomSimpleDialog(
-          title: "Where To Play?",
-          subTitle: "Please select a server first",
-          buttonText: "Got it",
-        )
-      );
-      print("Server not selected");
-      return;
-    }
-
     if (MainApp.currentUser == null){
+      Navigator.pop(context);
       showDialog(
         context: context,
         builder: (context) => CustomSimpleDialog(
@@ -225,7 +233,6 @@ class VideoCard extends StatelessWidget {
           buttonText: "Got it",
         )
       );
-      print("User not signed in");
       return;
     }
     dynamic token = MainApp.currentUser?.token;
@@ -247,5 +254,7 @@ class VideoCard extends StatelessWidget {
         )
       );
     }
+
+    Navigator.pop(context);
   }
 }

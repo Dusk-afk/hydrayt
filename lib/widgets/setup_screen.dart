@@ -431,7 +431,8 @@ class TokenErrorDialog extends StatelessWidget {
 
 
 class SettingUpDialog extends StatelessWidget {
-  const SettingUpDialog({Key? key}) : super(key: key);
+  String text;
+  SettingUpDialog({Key? key, this.text = "Setting Up"}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -442,17 +443,17 @@ class SettingUpDialog extends StatelessWidget {
         child: Row(
           mainAxisSize: MainAxisSize.min,
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-          children: const [
+          children: [
             Text(
-              "Setting Up",
-              style: TextStyle(
+              text,
+              style: const TextStyle(
                 color: Color(0xFFADADAD),
                 fontSize: 21,
                 fontFamily: "segoe",
                 fontWeight: FontWeight.w600
               ),
             ),
-            SizedBox(
+            const SizedBox(
               width: 20,
               height: 20,
               child: CircularProgressIndicator(

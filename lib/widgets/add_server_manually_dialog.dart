@@ -87,86 +87,6 @@ class _AddServerManuallyDialogState extends State<AddServerManuallyDialog> {
             ),
             SizedBox(height: 20,),
 
-            // Channel ID Text Field
-            Container(
-              margin: EdgeInsets.symmetric(horizontal: 30),
-              child: Row(
-                children: [
-                  const Text(
-                    "Channel ID ",
-                    style: TextStyle(
-                      color: Color(0xFF72767D),
-                      fontSize: 16,
-                      fontFamily: "segoe",
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                  TextButton(
-                    onPressed: () {
-                      showDialog(
-                        barrierColor: Colors.transparent,
-                        context: context,
-                        builder: (context) => SetupStep2Dialog()
-                      );
-                    },
-                    child: const Text(
-                      "?",
-                      style: TextStyle(
-                          color: Color(0xFF5865F2),
-                          fontSize: 18,
-                          fontFamily: "segoe",
-                          fontWeight: FontWeight.w600
-                      ),
-                    ),
-                    style: ButtonStyle(
-                      overlayColor: MaterialStateProperty.all(Colors.transparent),
-                      padding: MaterialStateProperty.all(EdgeInsets.zero),
-                      minimumSize: MaterialStateProperty.all(Size.zero)
-                    ),
-                  )
-                ],
-              ),
-            ),
-            SizedBox(height: 7,),
-            Container(
-              margin: EdgeInsets.symmetric(horizontal: 30),
-              child: TextField(
-                controller: _channelIdController,
-                style: const TextStyle(
-                  color: Color(0xFF70747B),
-                  fontSize: 16,
-                  fontFamily: "segoe",
-                  fontWeight: FontWeight.w600,
-                ),
-                cursorColor: const Color(0xFF5E74FF),
-                decoration: InputDecoration(
-                  focusColor: const Color(0xFF5E74FF),
-                  errorStyle: TextStyle(height: 0),
-                  errorText: _channelIdFieldValidate? " " : null,
-                  fillColor: Color(0xFF202225),
-                  filled: true,
-                  contentPadding: EdgeInsets.all(10.0),
-                  enabledBorder: OutlineInputBorder(
-                    borderSide: const BorderSide(color: Color(0xFF202225)),
-                    borderRadius: BorderRadius.circular(5),
-                  ),
-                  focusedBorder: OutlineInputBorder(
-                    borderSide: const BorderSide(color: Color(0xFF5E74FF)),
-                    borderRadius: BorderRadius.circular(5),
-                  ),
-                  errorBorder: OutlineInputBorder(
-                    borderSide: const BorderSide(color: Colors.red),
-                    borderRadius: BorderRadius.circular(5),
-                  ),
-                  focusedErrorBorder: OutlineInputBorder(
-                    borderSide: const BorderSide(color: Color(0xFF5E74FF)),
-                    borderRadius: BorderRadius.circular(5),
-                  ),
-                ),
-              ),
-            ),
-            SizedBox(height: 36,),
-
             // Server ID Text Field
             Container(
               margin: EdgeInsets.symmetric(horizontal: 30),
@@ -184,9 +104,9 @@ class _AddServerManuallyDialogState extends State<AddServerManuallyDialog> {
                   TextButton(
                     onPressed: () {
                       showDialog(
-                        barrierColor: Colors.transparent,
-                        context: context,
-                        builder: (context) => SetupStep3Dialog()
+                          barrierColor: Colors.transparent,
+                          context: context,
+                          builder: (context) => SetupStep3Dialog()
                       );
                     },
                     child: const Text(
@@ -223,6 +143,86 @@ class _AddServerManuallyDialogState extends State<AddServerManuallyDialog> {
                   focusColor: const Color(0xFF5E74FF),
                   errorStyle: TextStyle(height: 0),
                   errorText: _serverIdFieldValidate? " " : null,
+                  fillColor: Color(0xFF202225),
+                  filled: true,
+                  contentPadding: EdgeInsets.all(10.0),
+                  enabledBorder: OutlineInputBorder(
+                    borderSide: const BorderSide(color: Color(0xFF202225)),
+                    borderRadius: BorderRadius.circular(5),
+                  ),
+                  focusedBorder: OutlineInputBorder(
+                    borderSide: const BorderSide(color: Color(0xFF5E74FF)),
+                    borderRadius: BorderRadius.circular(5),
+                  ),
+                  errorBorder: OutlineInputBorder(
+                    borderSide: const BorderSide(color: Colors.red),
+                    borderRadius: BorderRadius.circular(5),
+                  ),
+                  focusedErrorBorder: OutlineInputBorder(
+                    borderSide: const BorderSide(color: Color(0xFF5E74FF)),
+                    borderRadius: BorderRadius.circular(5),
+                  ),
+                ),
+              ),
+            ),
+            SizedBox(height: 36,),
+
+            // Channel ID Text Field
+            Container(
+              margin: EdgeInsets.symmetric(horizontal: 30),
+              child: Row(
+                children: [
+                  const Text(
+                    "Channel ID ",
+                    style: TextStyle(
+                      color: Color(0xFF72767D),
+                      fontSize: 16,
+                      fontFamily: "segoe",
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                  TextButton(
+                    onPressed: () {
+                      showDialog(
+                          barrierColor: Colors.transparent,
+                          context: context,
+                          builder: (context) => SetupStep2Dialog()
+                      );
+                    },
+                    child: const Text(
+                      "?",
+                      style: TextStyle(
+                          color: Color(0xFF5865F2),
+                          fontSize: 18,
+                          fontFamily: "segoe",
+                          fontWeight: FontWeight.w600
+                      ),
+                    ),
+                    style: ButtonStyle(
+                        overlayColor: MaterialStateProperty.all(Colors.transparent),
+                        padding: MaterialStateProperty.all(EdgeInsets.zero),
+                        minimumSize: MaterialStateProperty.all(Size.zero)
+                    ),
+                  )
+                ],
+              ),
+            ),
+            SizedBox(height: 7,),
+            Container(
+              margin: EdgeInsets.symmetric(horizontal: 30),
+              child: TextField(
+                controller: _channelIdController,
+                style: const TextStyle(
+                  color: Color(0xFF70747B),
+                  fontSize: 16,
+                  fontFamily: "segoe",
+                  fontWeight: FontWeight.w600,
+                ),
+                cursorColor: const Color(0xFF5E74FF),
+                decoration: InputDecoration(
+                  focusColor: const Color(0xFF5E74FF),
+                  errorStyle: TextStyle(height: 0),
+                  errorText: _channelIdFieldValidate? " " : null,
                   fillColor: Color(0xFF202225),
                   filled: true,
                   contentPadding: EdgeInsets.all(10.0),
@@ -459,7 +459,7 @@ class SetupStep1Dialog extends StatelessWidget {
                     showDialog(
                         barrierColor: Colors.transparent,
                         context: context,
-                        builder: (context) => SetupStep2Dialog()
+                        builder: (context) => SetupStep3Dialog()
                     );
                   },
                   text: "Next",
@@ -569,13 +569,8 @@ class SetupStep2Dialog extends StatelessWidget {
                 SelectButton(
                   onPressed: () {
                     Navigator.pop(context);
-                    showDialog(
-                        barrierColor: Colors.transparent,
-                        context: context,
-                        builder: (context) => SetupStep3Dialog()
-                    );
                   },
-                  text: "Next",
+                  text: "Done",
                   width: 88,
                 ),
                 SizedBox(width: 25,)
@@ -615,7 +610,7 @@ class SetupStep3Dialog extends StatelessWidget {
               children: [
                 Expanded(child: SizedBox(width: 1,)),
                 Text(
-                  "How to get Server ID?",
+                  "Get Server ID",
                   style: TextStyle(
                       color: Color(0xFFADADAD),
                       fontFamily: "segoe",
@@ -662,7 +657,7 @@ class SetupStep3Dialog extends StatelessWidget {
             Container(
               margin: EdgeInsets.symmetric(horizontal: 56),
               clipBehavior: Clip.antiAliasWithSaveLayer,
-              child: Image.asset("assets/setup_step_1.png"),
+              child: Image.asset("assets/setup_step_3.png"),
               decoration: BoxDecoration(
                   borderRadius: BorderRadius.all(Radius.circular(6)),
                   boxShadow: [
@@ -682,8 +677,13 @@ class SetupStep3Dialog extends StatelessWidget {
                 SelectButton(
                   onPressed: () {
                     Navigator.pop(context);
+                    showDialog(
+                        barrierColor: Colors.transparent,
+                        context: context,
+                        builder: (context) => SetupStep2Dialog()
+                    );
                   },
-                  text: "Done",
+                  text: "Next",
                   width: 88,
                 ),
                 SizedBox(width: 25,)
