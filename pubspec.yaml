@@ -94,6 +94,9 @@ flutter:
     - family: segoebold
       fonts:
         - asset: fonts/segoeuib.ttf
+    - family: kuro
+      fonts:
+        - asset: fonts/kuro.otf
   #         style: italic
   #   - family: Trajan Pro
   #     fonts:

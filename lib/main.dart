@@ -35,6 +35,7 @@ void main() {
   doWhenWindowReady(() {
     appWindow.size = Size(1024, 768);
     appWindow.minSize = Size(800, 600);
+    appWindow.title = "HydraYT";
     appWindow.show();
   });
 }

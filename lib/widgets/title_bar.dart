@@ -22,6 +22,16 @@ class _TitleBarState extends State<TitleBar> {
           color: Color(0xFF202225),
           child: Row(
             children: [
+              SizedBox(width: 12,),
+              Text(
+                "BETA",
+                style: TextStyle(
+                  color: Color(0xFF72767D),
+                  fontFamily: "kuro",
+                  fontWeight: FontWeight.w600,
+                  fontSize: 10
+                ),
+              ),
               Expanded(
                   child: SizedBox(
                 width: 1,

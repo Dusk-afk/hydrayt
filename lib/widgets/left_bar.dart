@@ -29,6 +29,7 @@ class _LeftBarState extends State<LeftBar> {
 
       child: Column(
         children: [
+          SizedBox(height: 4,),
           MainApp.showSetupScreen?
           ServerButton(
             onPressed: () {},
