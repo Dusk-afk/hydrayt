@@ -41,11 +41,6 @@ class User{
       bannerColor = data["banner_color"];
 
       isValid = true;
-
-      // print(id);
-      // print(username);
-      // print(discriminator);
-      // print(email);
     }catch(e){
       isValid = false;
     }
@@ -54,11 +49,7 @@ class User{
   Future<dynamic> getData() async {
     http.Response response = await http.get(
       Uri.parse("https://discordapp.com/api/v6/users/@me"),
-      headers: {
-        "Content-Type": "application/json",
-        "User-Agent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/44.0.2403.157 Safari/537.36",
-        "Authorization": token
-      }
+      headers: getHeaders()
     );
 
     return jsonDecode(response.body);
@@ -89,6 +80,14 @@ class User{
       "avatar":avatar,
       "bio":bio,
       "bannerColor":bannerColor
+    };
+  }
+
+  Map<String, String> getHeaders(){
+    return {
+      "Content-Type": "application/json",
+      "User-Agent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/44.0.2403.157 Safari/537.36",
+      "Authorization": token
     };
   }
 }

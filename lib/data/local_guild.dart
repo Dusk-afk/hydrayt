@@ -37,4 +37,8 @@ class LocalGuild{
 
     return currentUserGuilds;
   }
+
+  Uri getMessageUrl() {
+    return Uri.parse("https://discord.com/api/v9/channels/$channel_id/messages");
+  }
 }

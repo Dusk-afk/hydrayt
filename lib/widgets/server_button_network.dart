@@ -28,7 +28,7 @@ class _ServerButtonNetworkState extends State<ServerButtonNetwork> {
         AnimatedContainer(
           duration: Duration(milliseconds: 100),
           width: 4,
-          height: ServerButtonNetwork.currentSelected == null? _hovered? 16 : 0 : ServerButtonNetwork.currentSelected!.id == widget.guild.id? 40 : _hovered? 16 : 0,
+          height: ServerButtonNetwork.currentSelected == null? _hovered? 16 : 0 : ServerButtonNetwork.currentSelected!.channel_id == widget.guild.channel_id? 40 : _hovered? 16 : 0,
           decoration: BoxDecoration(
             color: Colors.white,
             borderRadius: BorderRadius.only(
@@ -102,7 +102,7 @@ class _ServerButtonNetworkState extends State<ServerButtonNetwork> {
                           _hovered?
                             18 : 25
                           :
-                          ServerButtonNetwork.currentSelected!.id == widget.guild.id?
+                          ServerButtonNetwork.currentSelected!.channel_id == widget.guild.channel_id?
                             18 :
                             _hovered?
                               18 : 25
