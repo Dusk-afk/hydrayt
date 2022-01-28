@@ -126,6 +126,7 @@ class _AppBarState extends State<AppBar> {
               Expanded(
                 flex: 10,
                 child: TextField(
+                  onSubmitted: (_) {searchButtonHandler();},
                   controller: _searchFieldController,
                   style: const TextStyle(
                     color: Color(0xFF70747B),
@@ -200,7 +201,6 @@ class _AppBarState extends State<AppBar> {
     if (searchQuery.isEmpty){
       setState(() {
         _searchFieldValidate = true;
-        _tappedOnSearch = false;
       });
       return;
     }
