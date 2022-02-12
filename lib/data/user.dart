@@ -17,6 +17,8 @@ class User{
   late String bio;
   late String bannerColor;
 
+  String source = "Unknown";
+
   static Future<User?> getCurrentUser() async {
     Directory userDir = Directory((await getApplicationDocumentsDirectory()).path + "\\HydraYTBot");
     File userFile = File(userDir.path + "\\user.dk");
@@ -26,7 +28,7 @@ class User{
     return user.isValid? user : null;
   }
 
-  User.fromToken(this.token){
+  User.fromToken(this.token, {this.source = "Unknown"}){
     // init();
   }
 
@@ -37,8 +39,8 @@ class User{
       username = data["username"];
       discriminator = data["discriminator"];
       avatar = data["avatar"];
-      bio = data["bio"];
-      bannerColor = data["banner_color"];
+      bio = data["bio"]??="";
+      bannerColor = data["banner_color"]??="#5865F2";
 
       isValid = true;
     }catch(e){

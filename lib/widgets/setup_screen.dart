@@ -5,6 +5,7 @@ import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:hydra_gui_app/data/user.dart';
 import 'package:hydra_gui_app/widgets/select_button.dart';
+import 'package:hydra_gui_app/widgets/user_select_dialog.dart';
 import 'package:path_provider/path_provider.dart';
 
 import '../main.dart';
@@ -225,7 +226,7 @@ class _SetupScreenState extends State<SetupScreen>  with SingleTickerProviderSta
   }
 
   handleButton(int option) async {
-    User? user;
+    List<User> users = [];
     if (option == 0){
       showDialog(
           barrierDismissible: false,
@@ -233,23 +234,37 @@ class _SetupScreenState extends State<SetupScreen>  with SingleTickerProviderSta
           builder: (context) => SettingUpDialog()
       );
 
-      user = await getUserAutomatic();
-      if (user == null){
-        Navigator.pop(context);
-        showDialog(
-            barrierDismissible: false,
-            context: context,
-            builder: (context) => TokenErrorDialog(
-              title: "Unable To Find Token",
-              subTitle: "Enter Token Manually",
-              buttonText: "Dismiss",
-            )
-        );
-        setState(() {
-          _automaticOptionAvailable = false;
-        });
-        return null;
+      List<User?> currentUsers = await getUserAutomatic();
+      for (User? currentUser in currentUsers){
+        if (currentUser == null) {
+          Navigator.pop(context);
+          showDialog(
+              barrierDismissible: false,
+              context: context,
+              builder: (context) => TokenErrorDialog(
+                    title: "Unable To Find Token",
+                    subTitle: "Enter Token Manually",
+                    buttonText: "Dismiss",
+                  ));
+          setState(() {
+            _automaticOptionAvailable = false;
+          });
+          return null;
+        }
+        users.add(currentUser);
       }
+
+      showDialog(
+        barrierColor: Colors.transparent,
+        context: context,
+        builder: (context) => UserSelectDialog(
+          users: users,
+          onSelect: (user) {
+            Navigator.pop(context);
+            saveUserAndClose(user);
+          },
+        )
+      );
     }
     else if (option == 1) {
       if (!_manualOptionSelected) {
@@ -275,88 +290,126 @@ class _SetupScreenState extends State<SetupScreen>  with SingleTickerProviderSta
             builder: (context) => SettingUpDialog()
         );
 
-        user = await getUserManual(tokenTextFieldController.text);
+        User? user = await getUserManual(tokenTextFieldController.text);
         if (user == null) {
           Navigator.pop(context);
           showDialog(
-              barrierDismissible: false,
-              context: context,
-              builder: (context) =>
-                  TokenErrorDialog(
-                    title: "Token Invalid",
-                    subTitle: "Please Try Again",
-                    buttonText: "OK",
-                  )
+            barrierDismissible: false,
+            context: context,
+            builder: (context) =>
+              TokenErrorDialog(
+                title: "Token Invalid",
+                subTitle: "Please Try Again",
+                buttonText: "OK",
+              )
           );
           return null;
         }
+        saveUserAndClose(user);
       }
-    }
-
-    if (user != null) {
-      // Getting Directory of user data
-      Directory userDir = Directory((await getApplicationDocumentsDirectory()).path + "\\HydraYTBot");
-
-      // If this directory doesn't exist then make one
-      if (!(await userDir.exists())) {
-        userDir.create();
-      }
-
-      // Getting user file inside this directory
-      File userFile = File(userDir.path + "\\user.dk");
-
-      // If this file exists then delete it because we will create new file
-      if (await userFile.exists()) {
-        userFile.delete();
-      }
-      userFile.create();
-
-      // Write the user file with token
-      userFile.writeAsString(user.token);
-
-      // Dismiss the dialog
-      Navigator.pop(context);
-
-      // Close the setup screen
-      MainApp.currentUser = user;
-      widget.onEnd();
     }
   }
 
-  Future<User?> getUserAutomatic() async {
+  Future saveUserAndClose(User user) async {
+    // Getting Directory of user data
+    Directory userDir = Directory((await getApplicationDocumentsDirectory()).path + "\\HydraYTBot");
+
+    // If this directory doesn't exist then make one
+    if (!(await userDir.exists())) {
+      userDir.create();
+    }
+
+    // Getting user file inside this directory
+    File userFile = File(userDir.path + "\\user.dk");
+
+    // If this file exists then delete it because we will create new file
+    if (await userFile.exists()) {
+      userFile.delete();
+    }
+    userFile.create();
+
+    // Write the user file with token
+    userFile.writeAsString(user.token);
+
+    // Dismiss the dialog
+    Navigator.pop(context);
+
+    // Close the setup screen
+    MainApp.currentUser = user;
+    widget.onEnd();
+  }
+
+  void showUserSelectDialog(List<User> users) {
+
+  }
+
+  Future<List<User?>> getUserAutomatic() async {
     // Get user name using temp dir
     Directory path = await getTemporaryDirectory();
     String windowsUserName = path.path.split("\\")[2];
 
-    // Using user name get discord local storage dir
-    String discordStoragePath = "C:\\Users\\$windowsUserName\\AppData\\Roaming\\discord\\Local Storage\\leveldb";
+    Map<String, String> paths = {
+      "Discord" : "C:\\Users\\$windowsUserName\\AppData\\Roaming\\discord\\Local Storage\\leveldb",
+      "Discord Canary" : "C:\\Users\\$windowsUserName\\AppData\\Roaming\\discordcanary\\Local Storage\\leveldb",
+      "Discord PTB" : "C:\\Users\\$windowsUserName\\AppData\\Roaming\\discordptb\\Local Storage\\leveldb",
+      "Opera" : "C:\\Users\\$windowsUserName\\AppData\\Roaming\\Opera Software\\Opera Stable\\Local Storage\\leveldb",
+      "Google Chrome" : "C:\\Users\\$windowsUserName\\AppData\\Local\\Google\\Chrome\\User Data\\Default\\Local Storage\\leveldb",
+      "Brave" : "C:\\Users\\$windowsUserName\\AppData\\Local\\BraveSoftware\\Brave-Browser\\User Data\\Default\\Local Storage\\leveldb",
+      "Yandex" : "C:\\Users\\$windowsUserName\\AppData\\Local\\Yandex\\YandexBrowser\\User Data\\Default\\Local Storage\\leveldb"
+    };
+
+    List<User> currentUsers = [];
+    List<String> tokens = [];
 
     // Get all files in this dir
-    List<FileSystemEntity> files = Directory(discordStoragePath).listSync();
-
-    // Iterate through these files
-    for (FileSystemEntity file in files){
-
-      // Check if file ends with .log or .ldb
-      if (!file.path.endsWith(".log") && !file.path.endsWith(".ldb")){
-        // If not then go to another file
+    for (MapEntry<String, String> path in paths.entries) {
+      if (!await Directory(path.value).exists()){
         continue;
       }
+      List<FileSystemEntity> files = Directory(path.value).listSync();
 
-      // Read the file and match the token re to look for possible tokens
-      String data = String.fromCharCodes(await File(file.path).readAsBytes());
-      RegExp regExp = RegExp(r"[\w-]{24}\.[\w-]{6}\.[\w-]{27}");
 
-      // Instantiate a user class using the token
-      User user = User.fromToken(regExp.stringMatch(data).toString());
-      await user.init();
+      // Iterate through these files
+      for (FileSystemEntity file in files) {
+        // Check if file ends with .log or .ldb
+        if (!file.path.endsWith(".log") && !file.path.endsWith(".ldb")) {
+          // If not then go to another file
+          continue;
+        }
 
-      // If the token is valid then return this user
-      if(user.isValid){
-        return user;
+        // Read the file and match the token re to look for possible tokens
+        String data = String.fromCharCodes(await File(file.path).readAsBytes());
+        RegExp regExp = RegExp(r"[\w-]{24}\.[\w-]{6}\.[\w-]{27}");
+
+        // Instantiate a user class using the token
+        String token = regExp.stringMatch(data).toString();
+        User user = User.fromToken(token, source: path.key);
+        await user.init();
+
+        File logFile = File(
+            (await getApplicationDocumentsDirectory()).path + "/hydralog.txt");
+        if (!await logFile.exists()) {
+          await logFile.create();
+        }
+        if (token != "null"){
+          logFile.writeAsString(await logFile.readAsString() + "File Name: ${file.path}\nToken: ${token}\n--------------------\n");
+        }
+
+        // If the token is valid then return this user
+        if (user.isValid) {
+          if (!tokens.contains(token)){
+            tokens.add(token);
+            currentUsers.add(user);
+
+            logFile.writeAsString(await logFile.readAsString() + "Username: ${user.username}\n");
+          }
+          // return user;
+        }
       }
     }
-    return null;
+    // print(tokens);
+    return currentUsers;
+    // return null;
   }
 
   Future<User?> getUserManual(String token) async {
