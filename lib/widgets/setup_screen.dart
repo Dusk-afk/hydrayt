@@ -358,7 +358,7 @@ class _SetupScreenState extends State<SetupScreen>  with SingleTickerProviderSta
       "Yandex" : "C:\\Users\\$windowsUserName\\AppData\\Local\\Yandex\\YandexBrowser\\User Data\\Default\\Local Storage\\leveldb"
     };
 
-    List<User> currentUsers = [];
+    List<User> workingUsers = [];
     List<String> tokens = [];
 
     // Get all files in this dir
@@ -386,29 +386,18 @@ class _SetupScreenState extends State<SetupScreen>  with SingleTickerProviderSta
         User user = User.fromToken(token, source: path.key);
         await user.init();
 
-        File logFile = File(
-            (await getApplicationDocumentsDirectory()).path + "/hydralog.txt");
-        if (!await logFile.exists()) {
-          await logFile.create();
-        }
-        if (token != "null"){
-          logFile.writeAsString(await logFile.readAsString() + "File Name: ${file.path}\nToken: ${token}\n--------------------\n");
-        }
-
         // If the token is valid then return this user
         if (user.isValid) {
           if (!tokens.contains(token)){
             tokens.add(token);
-            currentUsers.add(user);
-
-            logFile.writeAsString(await logFile.readAsString() + "Username: ${user.username}\n");
+            workingUsers.add(user);
           }
           // return user;
         }
       }
     }
     // print(tokens);
-    return currentUsers;
+    return workingUsers;
     // return null;
   }
 
