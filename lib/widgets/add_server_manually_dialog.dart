@@ -1,11 +1,12 @@
 import 'dart:convert';
 import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:hydra_gui_app/data/guild.dart';
+import 'package:hydra_gui_app/main.dart';
 import 'package:hydra_gui_app/widgets/select_button.dart';
 import 'package:hydra_gui_app/widgets/setup_screen.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:http/http.dart' as http;
 
 class AddServerManuallyDialog extends StatefulWidget {
   Function reload;
@@ -312,9 +313,9 @@ class _AddServerManuallyDialogState extends State<AddServerManuallyDialog> {
 
   addGuildToData(String channelId, String serverId) async {
     showDialog(
-        barrierDismissible: false,
-        context: context,
-        builder: (context) => SettingUpDialog()
+      barrierDismissible: false,
+      context: context,
+      builder: (context) => SettingUpDialog()
     );
 
     Directory userDir = Directory((await getApplicationDocumentsDirectory()).path + "\\HydraYTBot");
@@ -328,17 +329,80 @@ class _AddServerManuallyDialogState extends State<AddServerManuallyDialog> {
     }
 
     if (guild == null){
-      // TODO: Show message: You are not joined to this server
       print("Not joined in this server");
       Navigator.pop(context);
       return;
+    }
+
+    String? messageId;
+    try{
+      http.Response response = await http.get(
+        Uri.parse("https://discord.com/api/v9/channels/$channelId/messages"),
+        headers: {
+          "Content-Type": "application/json",
+          "User-Agent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/44.0.2403.157 Safari/537.36",
+          "Authorization": MainApp.currentUser!.token
+        }
+      );
+
+      try{
+        messageId = await jsonDecode(response.body)[0]["id"];
+      }catch(e){
+        showDialog(
+          context: context,
+          builder: (context) => AlertDialog(
+            title: Text("Error Occured"),
+            content: Text(e.toString()),
+            actions: [
+              MaterialButton(
+                onPressed: () => Navigator.pop(context),
+                child: Text("OK"),
+              )
+            ],
+          )
+        );
+      }
+    }
+
+    on SocketException{
+      // No Internet
+      showDialog(
+        context: context,
+        builder: (context) => AlertDialog(
+          title: Text("Request Timed Out"),
+          content: Text("Check you internet connection and try again later"),
+          actions: [
+            MaterialButton(
+              onPressed: () => Navigator.pop(context),
+              child: Text("OK"),
+            )
+          ],
+        )
+      );
+    }
+
+    catch(e){
+      // Other error
+      showDialog(
+        context: context,
+        builder: (context) => AlertDialog(
+          title: Text("Error Occured"),
+          content: Text(e.toString()),
+          actions: [
+            MaterialButton(
+              onPressed: () => Navigator.pop(context),
+              child: Text("OK"),
+            )
+          ],
+        )
+      );
     }
 
     // Create this file if it doesn't exist
     if (!(await guildsFile.exists())){
       guildsFile.create();
 
-      String guildDetails = '{"id":"${guild.id}", "name":"${guild.name}", "icon":"${guild.icon}", "channel_id":"${channelId}"}';
+      String guildDetails = '{"id":"${guild.id}", "name":"${guild.name}", "icon":"${guild.icon}", "channel_id":"$channelId", "message_id":"$messageId"}';
       List<dynamic> payload = [guildDetails];
       guildsFile.writeAsString(payload.toString());
 
@@ -360,7 +424,7 @@ class _AddServerManuallyDialogState extends State<AddServerManuallyDialog> {
       // File is probably corrupted
       fileData = [];
     }
-    String guildDetails = '{"id":"${guild.id}", "name":"${guild.name}", "icon":"${guild.icon}", "channel_id":"${channelId}"}';
+    String guildDetails = '{"id":"${guild.id}", "name":"${guild.name}", "icon":"${guild.icon}", "channel_id":"$channelId", "message_id":"$messageId"}';
     fileData.add(jsonDecode(guildDetails));
 
     guildsFile.writeAsString(jsonEncode(fileData));
@@ -551,14 +615,14 @@ class SetupStep2Dialog extends StatelessWidget {
               clipBehavior: Clip.antiAliasWithSaveLayer,
               child: Image.asset("assets/setup_step_2.png"),
               decoration: BoxDecoration(
-                  borderRadius: BorderRadius.all(Radius.circular(6)),
-                  boxShadow: [
-                    BoxShadow(
-                        color: Color.fromARGB(50, 0, 0, 0),
-                        blurRadius: 5,
-                        offset: Offset(0, 5)
-                    )
-                  ]
+                borderRadius: BorderRadius.all(Radius.circular(6)),
+                boxShadow: [
+                  BoxShadow(
+                    color: Color.fromARGB(50, 0, 0, 0),
+                    blurRadius: 5,
+                    offset: Offset(0, 5)
+                  )
+                ]
               ),
             ),
 
@@ -612,10 +676,10 @@ class SetupStep3Dialog extends StatelessWidget {
                 Text(
                   "Get Server ID",
                   style: TextStyle(
-                      color: Color(0xFFADADAD),
-                      fontFamily: "segoe",
-                      fontWeight: FontWeight.w600,
-                      fontSize: 17
+                    color: Color(0xFFADADAD),
+                    fontFamily: "segoe",
+                    fontWeight: FontWeight.w600,
+                    fontSize: 17
                   ),
                 ),
                 Expanded(child: SizedBox(width: 1,)),
@@ -659,14 +723,14 @@ class SetupStep3Dialog extends StatelessWidget {
               clipBehavior: Clip.antiAliasWithSaveLayer,
               child: Image.asset("assets/setup_step_3.png"),
               decoration: BoxDecoration(
-                  borderRadius: BorderRadius.all(Radius.circular(6)),
-                  boxShadow: [
-                    BoxShadow(
-                        color: Color.fromARGB(50, 0, 0, 0),
-                        blurRadius: 5,
-                        offset: Offset(0, 5)
-                    )
-                  ]
+                borderRadius: BorderRadius.all(Radius.circular(6)),
+                boxShadow: [
+                  BoxShadow(
+                    color: Color.fromARGB(50, 0, 0, 0),
+                    blurRadius: 5,
+                    offset: Offset(0, 5)
+                  )
+                ]
               ),
             ),
 
@@ -678,9 +742,9 @@ class SetupStep3Dialog extends StatelessWidget {
                   onPressed: () {
                     Navigator.pop(context);
                     showDialog(
-                        barrierColor: Colors.transparent,
-                        context: context,
-                        builder: (context) => SetupStep2Dialog()
+                      barrierColor: Colors.transparent,
+                      context: context,
+                      builder: (context) => SetupStep2Dialog()
                     );
                   },
                   text: "Next",
@@ -700,7 +764,7 @@ class SetupStep3Dialog extends StatelessWidget {
       ),
       backgroundColor: Colors.transparent,
       shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.all(Radius.circular(10))),
+        borderRadius: BorderRadius.all(Radius.circular(10))),
     );
   }
 }

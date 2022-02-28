@@ -4,10 +4,12 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:hydra_gui_app/main.dart';
+import 'package:hydra_gui_app/models/video_model.dart';
 import 'package:hydra_gui_app/widgets/select_button.dart';
 import 'package:hydra_gui_app/widgets/server_button_network.dart';
 import 'package:hydra_gui_app/widgets/setup_screen.dart';
 import 'package:hydra_gui_app/widgets/simple_dialog.dart';
+import 'package:provider/provider.dart';
 import 'package:youtube_explode_dart/youtube_explode_dart.dart';
 import 'package:http/http.dart' as http;
 
@@ -134,6 +136,7 @@ class VideoCard extends StatelessWidget {
                       fontFamily: "segoe",
                       fontWeight: FontWeight.bold
                     ),
+                    overflow: TextOverflow.ellipsis,
                   ),
                   SizedBox(height: 8,),
                   Text(
@@ -199,12 +202,12 @@ class VideoCard extends StatelessWidget {
   void playButtonHandler() async {
     if (ServerButtonNetwork.currentSelected == null){
       showDialog(
-          context: context,
-          builder: (context) => CustomSimpleDialog(
-            title: "Where To Play?",
-            subTitle: "Please select a server first",
-            buttonText: "Got it",
-          )
+        context: context,
+        builder: (context) => CustomSimpleDialog(
+          title: "Where To Play?",
+          subTitle: "Please select a server first",
+          buttonText: "Got it",
+        )
       );
       return;
     }
@@ -237,24 +240,36 @@ class VideoCard extends StatelessWidget {
     }
     dynamic token = MainApp.currentUser?.token;
 
-    Uri? apiRoute = ServerButtonNetwork.currentSelected?.getMessageUrl();
-    http.Response response = await http.post(
-      apiRoute??=Uri.parse("default"),
-      headers: {"Authorization": token},
-      body: {"content":streamingUrl}
-    );
+    try{
+      Uri? apiRoute = ServerButtonNetwork.currentSelected?.getMessageUrl();
+      http.Response response = await http.post(
+        apiRoute??=Uri.parse("default"),
+        headers: {"Authorization": token},
+        body: {"content":streamingUrl}
+      );
 
-    if (response.statusCode != 200){
+      if (response.statusCode != 200){
+        showDialog(
+          context: context,
+          builder: (context) => CustomSimpleDialog(
+            title: "Oops! An Unknown Error",
+            subTitle: "Here is what you can do:\n1) Check your internet connection\n2) Make sure you entered right channel id while you were adding your server\n3) Try a different song\n\nIf you are a geek then this might help you:\n\tResponse status code: ${response.statusCode}",
+            buttonText: "Got it",
+          )
+        );
+      }
+    }catch(e){
       showDialog(
         context: context,
         builder: (context) => CustomSimpleDialog(
           title: "Oops! An Unknown Error",
-          subTitle: "Here is what you can do:\n1) Check your internet connection\n2) Make sure you entered right channel id while you were adding your server\n3) Try a different song\n\nIf you are a geek then this might help you:\n\tResponse status code: ${response.statusCode}",
+          subTitle: "Here is what you can do:\n1) Check your internet connection\n2) Make sure you entered right channel id while you were adding your server\n3) Try a different song}",
           buttonText: "Got it",
         )
       );
     }
 
     Navigator.pop(context);
+    context.read<VideoModel>().updateTrack(video, ServerButtonNetwork.currentSelected!);
   }
 }
