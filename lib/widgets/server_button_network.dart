@@ -1,6 +1,8 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:hydra_gui_app/data/guild.dart';
+import 'package:hydra_gui_app/models/guild_model.dart';
+import 'package:provider/provider.dart';
 import '../data/local_guild.dart';
 
 class ServerButtonNetwork extends StatefulWidget {
@@ -52,6 +54,7 @@ class _ServerButtonNetworkState extends State<ServerButtonNetwork> {
           },
           child: GestureDetector(
               onTap: () {
+                context.read<GuildModel>().changeGuild(widget.guild);
                 setState(() {
                   if (ServerButtonNetwork.currentSelected != widget.guild){
                     ServerButtonNetwork.currentSelected = widget.guild;

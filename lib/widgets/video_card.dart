@@ -4,10 +4,12 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:hydra_gui_app/main.dart';
+import 'package:hydra_gui_app/models/video_model.dart';
 import 'package:hydra_gui_app/widgets/select_button.dart';
 import 'package:hydra_gui_app/widgets/server_button_network.dart';
 import 'package:hydra_gui_app/widgets/setup_screen.dart';
 import 'package:hydra_gui_app/widgets/simple_dialog.dart';
+import 'package:provider/provider.dart';
 import 'package:youtube_explode_dart/youtube_explode_dart.dart';
 import 'package:http/http.dart' as http;
 
@@ -134,6 +136,7 @@ class VideoCard extends StatelessWidget {
                       fontFamily: "segoe",
                       fontWeight: FontWeight.bold
                     ),
+                    overflow: TextOverflow.ellipsis,
                   ),
                   SizedBox(height: 8,),
                   Text(
@@ -256,5 +259,6 @@ class VideoCard extends StatelessWidget {
     }
 
     Navigator.pop(context);
+    context.read<VideoModel>().updateTrack(video);
   }
 }

@@ -1,13 +1,14 @@
 import 'dart:convert';
 import 'dart:io';
-
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:hydra_gui_app/widgets/select_button.dart';
 import 'package:hydra_gui_app/widgets/setup_screen.dart';
 import 'package:path_provider/path_provider.dart';
 import '../data/guild.dart';
-import 'add_server_dialog.dart';
+import 'package:http/http.dart' as http;
+
+import '../main.dart';
 
 class AddServerFinalDialog extends StatefulWidget {
   Guild guild;
@@ -245,6 +246,71 @@ class _AddServerFinalDialogState extends State<AddServerFinalDialog> {
         builder: (context) => SettingUpDialog()
     );
 
+    String? messageId;
+    try{
+      http.Response response = await http.get(
+        Uri.parse("https://discord.com/api/v9/channels/$channelId/messages"),
+        headers: {
+          "Content-Type": "application/json",
+          "User-Agent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/44.0.2403.157 Safari/537.36",
+          "Authorization": MainApp.currentUser!.token
+        }
+      );
+
+      try{
+        List<dynamic> messages = await jsonDecode(response.body);
+        messageId = messages[messages.length - 2]["id"];
+      }catch(e){
+        showDialog(
+          context: context,
+          builder: (context) => AlertDialog(
+            title: Text("Error Occured"),
+            content: Text(e.toString()),
+            actions: [
+              MaterialButton(
+                onPressed: () => Navigator.pop(context),
+                child: Text("OK"),
+              )
+            ],
+          )
+        );
+      }
+    }
+
+    on SocketException{
+      // No Internet
+      showDialog(
+        context: context,
+        builder: (context) => AlertDialog(
+          title: Text("Request Timed Out"),
+          content: Text("Check you internet connection or try again later"),
+          actions: [
+            MaterialButton(
+              onPressed: () => Navigator.pop(context),
+              child: Text("OK"),
+            )
+          ],
+        )
+      );
+    }
+
+    catch(e){
+      // Other error
+      showDialog(
+        context: context,
+        builder: (context) => AlertDialog(
+          title: Text("Error Occured"),
+          content: Text(e.toString()),
+          actions: [
+            MaterialButton(
+              onPressed: () => Navigator.pop(context),
+              child: Text("OK"),
+            )
+          ],
+        )
+      );
+    }
+
     Directory userDir = Directory((await getApplicationDocumentsDirectory()).path + "\\HydraYTBot");
     File guildsFile = File(userDir.path + "\\guilds.dk");
 
@@ -252,7 +318,7 @@ class _AddServerFinalDialogState extends State<AddServerFinalDialog> {
     if (!(await guildsFile.exists())){
       guildsFile.create();
 
-      String guildDetails = '{"id":"${widget.guild.id}", "name":"${widget.guild.name}", "icon":"${widget.guild.icon}", "channel_id":"${channelId}"}';
+      String guildDetails = '{"id":"${widget.guild.id}", "name":"${widget.guild.name}", "icon":"${widget.guild.icon}", "channel_id":"$channelId", "message_id":"$messageId"}';
       List<dynamic> payload = [guildDetails];
       guildsFile.writeAsString(payload.toString());
 
@@ -276,7 +342,7 @@ class _AddServerFinalDialogState extends State<AddServerFinalDialog> {
       // File is probably corrupted
       fileData = [];
     }
-    String guildDetails = '{"id":"${widget.guild.id}", "name":"${widget.guild.name}", "icon":"${widget.guild.icon}", "channel_id":"${channelId}"}';
+    String guildDetails = '{"id":"${widget.guild.id}", "name":"${widget.guild.name}", "icon":"${widget.guild.icon}", "channel_id":"$channelId", "message_id":"$messageId"}';
     fileData.add(jsonDecode(guildDetails));
 
     guildsFile.writeAsString(jsonEncode(fileData));

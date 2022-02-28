@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:hydra_gui_app/widgets/server_button_network.dart';
+import 'package:hydra_gui_app/widgets/bottom_bar.dart';
 import 'package:hydra_gui_app/widgets/video_card.dart';
 import 'package:youtube_explode_dart/youtube_explode_dart.dart';
 
@@ -31,7 +31,7 @@ class _MainScreenState extends State<MainScreen> {
               });
             },
           ),
-          // Expanded(child: SizedBox(height: 1,)),
+
           _searchInitiated?
           FutureBuilder(
             future: getVideos(_currentSearchQuery),
@@ -39,6 +39,7 @@ class _MainScreenState extends State<MainScreen> {
               if (snapshot.connectionState != ConnectionState.waiting) {
                 if (snapshot.hasData) {
                   return Expanded(
+                    flex: 999,
                     child: ListView.builder(
                       itemCount: snapshot.data.length,
                       itemBuilder: (context, index) => VideoCard(
@@ -67,11 +68,15 @@ class _MainScreenState extends State<MainScreen> {
             },
           ) :
           Container(
-            padding: EdgeInsets.only(top: 5, right: 200),
+            padding: const EdgeInsets.only(top: 5, right: 200),
             width: 600,
             child: Image.asset("assets/try_searching.png"),
-          )
-          // Expanded(child: SizedBox(height: 1,)),
+          ),
+
+          Spacer(flex: 1,),
+
+          // Bottom Navigation Bar
+          BottomBar()
         ],
       ),
 

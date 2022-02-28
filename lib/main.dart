@@ -5,29 +5,38 @@ import 'dart:io';
 import 'package:bitsdojo_window/bitsdojo_window.dart';
 import 'package:flutter/material.dart';
 import 'package:hydra_gui_app/data/user.dart';
+import 'package:hydra_gui_app/models/guild_model.dart';
+import 'package:hydra_gui_app/models/video_model.dart';
 import 'package:hydra_gui_app/widgets/left_bar.dart';
 import 'package:hydra_gui_app/widgets/main_screen.dart';
 import 'package:hydra_gui_app/widgets/setup_screen.dart';
 import 'package:hydra_gui_app/widgets/title_bar.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:provider/provider.dart';
 
 void main() {
   runApp(
-    MaterialApp(
-      debugShowCheckedModeBanner: false,
-      home: MainApp(),
+    MultiProvider(
+      providers: [
+        ChangeNotifierProvider(create: (_) => VideoModel()),
+        ChangeNotifierProvider(create: (_) => GuildModel()),
+      ],
+      child: MaterialApp(
+        debugShowCheckedModeBanner: false,
+        home: MainApp(),
 
-      theme: ThemeData(
-        textTheme: TextTheme(
-          // AppBar Text
-          headline1: TextStyle(
-            fontSize: 17,
-            fontFamily: "segoe",
-            fontWeight: FontWeight.w600,
-            color: Color(0xFFADADAD),
-            letterSpacing: 2
+        theme: ThemeData(
+          textTheme: TextTheme(
+            // AppBar Text
+            headline1: TextStyle(
+              fontSize: 17,
+              fontFamily: "segoe",
+              fontWeight: FontWeight.w600,
+              color: Color(0xFFADADAD),
+              letterSpacing: 2
+            )
           )
-        )
+        ),
       ),
     )
   );
