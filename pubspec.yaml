@@ -48,7 +48,11 @@ dependencies:
   # For creating .msix package
   msix: ^2.8.18
 
+  # For creating models
   provider: ^6.0.2
+
+  # For context menu
+  native_context_menu: ^0.2.1+4
 
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.

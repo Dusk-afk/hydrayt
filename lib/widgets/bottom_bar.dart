@@ -6,6 +6,7 @@ import 'package:hydra_gui_app/data/local_guild.dart';
 import 'package:hydra_gui_app/main.dart';
 import 'package:hydra_gui_app/models/guild_model.dart';
 import 'package:hydra_gui_app/models/video_model.dart';
+import 'package:hydra_gui_app/widgets/settings_screen.dart';
 import 'package:provider/provider.dart';
 import 'package:youtube_explode_dart/youtube_explode_dart.dart';
 import 'package:http/http.dart' as http;
@@ -80,32 +81,39 @@ class _MusicControlsState extends State<_MusicControls> {
     return Row(
       children: [
         Spacer(),
-        _MusicControlButton(
+        MusicControlButton(
           onClick: () => replay(localGuild!),
           icon: Icons.replay,
           disabled: _disabled
         ),
         SizedBox(width: 12,),
-        _MusicControlButton(
+        MusicControlButton(
           onClick: () => playPause(localGuild!),
           imageIcon: Image.asset("assets/play_pause_icon.png"),
           disabled: _disabled
         ),
         SizedBox(width: 12,),
-        _MusicControlButton(
+        MusicControlButton(
           onClick: () => stop(localGuild!),
           icon: Icons.stop,
           disabled: _disabled
         ),
         SizedBox(width: 12,),
-        _MusicControlButton(
+        MusicControlButton(
           onClick: () => skip(localGuild!),
           icon: Icons.fast_forward,
           disabled: _disabled
         ),
         SizedBox(width: 12,),
-        _MusicControlButton(
-          onClick: () {},
+        MusicControlButton(
+          onClick: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => SettingsScreen()
+              )
+            );
+          },
           icon: Icons.settings,
         ),
         SizedBox(width: 20,)
@@ -172,19 +180,19 @@ class _MusicControlsState extends State<_MusicControls> {
   }
 }
 
-class _MusicControlButton extends StatefulWidget {
+class MusicControlButton extends StatefulWidget {
   final IconData? icon;
   final Image? imageIcon;
   final Function onClick;
   final bool disabled;
 
-  const _MusicControlButton({Key? key, this.icon, required this.onClick, this.imageIcon, this.disabled = false}) : super(key: key);
+  const MusicControlButton({Key? key, this.icon, required this.onClick, this.imageIcon, this.disabled = false}) : super(key: key);
 
   @override
-  _MusicControlButtonState createState() => _MusicControlButtonState();
+  MusicControlButtonState createState() => MusicControlButtonState();
 }
 
-class _MusicControlButtonState extends State<_MusicControlButton> {
+class MusicControlButtonState extends State<MusicControlButton> {
   bool _hovered = false;
   bool _pressed = false;
 
@@ -260,58 +268,106 @@ class _LastPlayedFrameState extends State<_LastPlayedFrame> {
   @override
   Widget build(BuildContext context) {
     Video? video = context.watch<VideoModel>().currentVideo;
+    LocalGuild? guild = context.read<VideoModel>().currentVideoGuild;
     String title = video!=null? video.title.length >= 30? video.title.substring(0, 30) + "..." : video.title : "";
 
     return Padding(
-      padding: const EdgeInsets.all(9),
+      padding: const EdgeInsets.symmetric(vertical: 9, horizontal: 15),
       child: video!=null?
         Row(
           children: [
-            Container(
+            SizedBox(
               width: 70,
-              height: double.infinity,
-              clipBehavior: Clip.antiAliasWithSaveLayer,
+              height: 70,
+              child: Stack(
+                children: [
+                  Container(
+                    width: 59,
+                    height: 59,
+                    clipBehavior: Clip.antiAliasWithSaveLayer,
 
-              child: SizedBox(
-                child: CachedNetworkImage(
-                  fit: BoxFit.cover,
-                  imageUrl: video.thumbnails.highResUrl,
-                  placeholder: (context, url) => SizedBox(
-                    width: 40,
-                    height: 40,
-                    child: CircularProgressIndicator(
-                      color: Color(0xFF5E74FF),
-                      strokeWidth: 3,
-                    ),
-                  ),
-                  errorWidget: (context, url, error) => Container(
-                    child: Center(
-                      child: Text(
-                        "Thumbnail Not Loaded",
-                        style: TextStyle(
-                            color: Color(0xFFD7D9DA),
-                            fontFamily: "segoe"
+                    child: SizedBox(
+                      child: CachedNetworkImage(
+                        fit: BoxFit.cover,
+                        imageUrl: video.thumbnails.highResUrl,
+                        placeholder: (context, url) => SizedBox(
+                          width: 40,
+                          height: 40,
+                          child: CircularProgressIndicator(
+                            color: Color(0xFF5E74FF),
+                            strokeWidth: 3,
+                          ),
+                        ),
+                        errorWidget: (context, url, error) => Container(
+                          child: Center(
+                            child: Text(
+                              "Thumbnail Not Loaded",
+                              style: TextStyle(
+                                  color: Color(0xFFD7D9DA),
+                                  fontFamily: "segoe"
+                              ),
+                            ),
+                          ),
+                          decoration: BoxDecoration(
+                            color: Color(0xFF36393F),
+                            borderRadius: BorderRadius.all(Radius.circular(40)),
+                          ),
                         ),
                       ),
                     ),
-                    decoration: BoxDecoration(
-                      color: Color(0xFF36393F),
-                      borderRadius: BorderRadius.all(Radius.circular(40))
+
+                    decoration: const BoxDecoration(
+                      // color: Color(0xFF36393F),
+                      borderRadius: BorderRadius.all(Radius.circular(5)),
+                      boxShadow: [
+                         BoxShadow(
+                          color: Color.fromARGB(40, 0, 0, 0),
+                          blurRadius: 3,
+                          offset: Offset(0, 3)
+                        )
+                      ]
                     ),
                   ),
-                ),
-              ),
 
-              decoration: const BoxDecoration(
-                // color: Color(0xFF36393F),
-                borderRadius: BorderRadius.all(Radius.circular(5)),
-                boxShadow: [
-                   BoxShadow(
-                    color: Color.fromARGB(40, 0, 0, 0),
-                    blurRadius: 3,
-                    offset: Offset(0, 3)
+                  Align(
+                    alignment: Alignment.bottomRight,
+                    child: Container(
+                      clipBehavior: Clip.antiAliasWithSaveLayer,
+                      child: CachedNetworkImage(
+                          width: 32,
+                          height: 32,
+                          imageUrl: "https://cdn.discordapp.com/icons/${guild?.id}/${guild?.icon}.webp?size=64",
+                          placeholder: (context, url) => CircularProgressIndicator(
+                            color: Color(0xFF5E74FF),
+                            strokeWidth: 3,
+                          ),
+                          errorWidget: (context, url, error) => Container(
+                            child: Center(
+                              child: Text(
+                                "${guild?.name[0]}",
+                                style: TextStyle(
+                                  fontSize: 16,
+                                  color: Color(0xFFD7D9DA),
+                                  fontFamily: "segoe"
+                                ),
+                              ),
+                            ),
+                          )
+                      ),
+                      decoration: BoxDecoration(
+                        color: Color(0xFF36393F),
+                        borderRadius: BorderRadius.circular(300),
+                        boxShadow: [
+                          BoxShadow(
+                              color: Color.fromARGB(80, 0, 0, 0),
+                              blurRadius: 4,
+                              offset: Offset(0, 4)
+                          )
+                        ]
+                      )
+                    ),
                   )
-                ]
+                ],
               ),
             ),
 

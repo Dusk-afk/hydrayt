@@ -202,12 +202,12 @@ class VideoCard extends StatelessWidget {
   void playButtonHandler() async {
     if (ServerButtonNetwork.currentSelected == null){
       showDialog(
-          context: context,
-          builder: (context) => CustomSimpleDialog(
-            title: "Where To Play?",
-            subTitle: "Please select a server first",
-            buttonText: "Got it",
-          )
+        context: context,
+        builder: (context) => CustomSimpleDialog(
+          title: "Where To Play?",
+          subTitle: "Please select a server first",
+          buttonText: "Got it",
+        )
       );
       return;
     }
@@ -240,25 +240,36 @@ class VideoCard extends StatelessWidget {
     }
     dynamic token = MainApp.currentUser?.token;
 
-    Uri? apiRoute = ServerButtonNetwork.currentSelected?.getMessageUrl();
-    http.Response response = await http.post(
-      apiRoute??=Uri.parse("default"),
-      headers: {"Authorization": token},
-      body: {"content":streamingUrl}
-    );
+    try{
+      Uri? apiRoute = ServerButtonNetwork.currentSelected?.getMessageUrl();
+      http.Response response = await http.post(
+        apiRoute??=Uri.parse("default"),
+        headers: {"Authorization": token},
+        body: {"content":streamingUrl}
+      );
 
-    if (response.statusCode != 200){
+      if (response.statusCode != 200){
+        showDialog(
+          context: context,
+          builder: (context) => CustomSimpleDialog(
+            title: "Oops! An Unknown Error",
+            subTitle: "Here is what you can do:\n1) Check your internet connection\n2) Make sure you entered right channel id while you were adding your server\n3) Try a different song\n\nIf you are a geek then this might help you:\n\tResponse status code: ${response.statusCode}",
+            buttonText: "Got it",
+          )
+        );
+      }
+    }catch(e){
       showDialog(
         context: context,
         builder: (context) => CustomSimpleDialog(
           title: "Oops! An Unknown Error",
-          subTitle: "Here is what you can do:\n1) Check your internet connection\n2) Make sure you entered right channel id while you were adding your server\n3) Try a different song\n\nIf you are a geek then this might help you:\n\tResponse status code: ${response.statusCode}",
+          subTitle: "Here is what you can do:\n1) Check your internet connection\n2) Make sure you entered right channel id while you were adding your server\n3) Try a different song}",
           buttonText: "Got it",
         )
       );
     }
 
     Navigator.pop(context);
-    context.read<VideoModel>().updateTrack(video);
+    context.read<VideoModel>().updateTrack(video, ServerButtonNetwork.currentSelected!);
   }
 }
