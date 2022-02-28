@@ -162,7 +162,7 @@ class _MainScreenState extends State<MainScreen> {
           Spacer(flex: 1,),
 
           // Bottom Navigation Bar
-          _searchInitiated? BottomBar() : Container()
+          _searchInitiated || video==null? BottomBar() : Container()
         ],
       ),
 
