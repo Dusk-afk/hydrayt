@@ -82,18 +82,25 @@ class _ServerButtonNetworkState extends State<ServerButtonNetwork> {
                     color: Color(0xFF5E74FF),
                     strokeWidth: 3,
                   ),
-                  errorWidget: (context, url, error) => Container(
-                    child: Center(
-                      child: Text(
-                        widget.guild.name[0],
-                        style: TextStyle(
-                          fontSize: 16,
-                          color: Color(0xFFD7D9DA),
-                          fontFamily: "segoe"
+                  errorWidget: (context, url, error) {
+                    widget.guild.tryUpdatingIcon((success) {
+                      if (success){
+                        setState(() {});
+                      }
+                    });
+                    return Container(
+                      child: Center(
+                        child: Text(
+                          widget.guild.name[0],
+                          style: TextStyle(
+                            fontSize: 16,
+                            color: Color(0xFFD7D9DA),
+                            fontFamily: "segoe"
+                          ),
                         ),
                       ),
-                    ),
-                  ),
+                    );
+                  }
                 ),
 
                 decoration: BoxDecoration(

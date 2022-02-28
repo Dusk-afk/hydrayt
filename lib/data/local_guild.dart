@@ -68,8 +68,8 @@ class LocalGuild{
       return;
     }
 
+    await updateMessageIdInLocal();
     if (callback!=null){
-      await updateMessageIdInLocal();
       callback(true);
     }
   }
@@ -90,6 +90,63 @@ class LocalGuild{
           item["channel_id"] == channel_id
         ){
           item["message_id"] = message_id;
+          break;
+        }
+      }
+
+    }catch(e){
+
+    }
+
+    await guildsFile.writeAsString(jsonEncode(jsonData));
+  }
+
+  Future tryUpdatingIcon(Function(bool success)? callback) async {
+    try{
+      http.Response response = await http.get(
+        Uri.parse("https://discordapp.com/api/v9/users/@me/guilds"),
+        headers: {
+          "Authorization": "${MainApp.currentUser?.token}"
+        }
+      );
+
+      List<dynamic> jsonGuilds = jsonDecode(response.body);
+
+      for (var item in jsonGuilds){
+        if (item["id"] == id){
+          icon = item["icon"];
+          break;
+        }
+      }
+    }
+    catch(e){
+      if (callback!=null){
+        callback(false);
+      }
+      return;
+    }
+
+    await updateIconInLocal();
+    if (callback!=null){
+      callback(true);
+    }
+  }
+
+  Future updateIconInLocal() async {
+    Directory userDir = Directory((await getApplicationDocumentsDirectory()).path + "\\HydraYTBot");
+    File guildsFile = File(userDir.path + "\\guilds.dk");
+
+    List<dynamic> jsonData = [];
+
+    try{
+      jsonData = jsonDecode(await guildsFile.readAsString());
+      for (var item in jsonData){
+        if (
+          item["id"] == id &&
+          item["name"] == name &&
+          item["channel_id"] == channel_id
+        ){
+          item["icon"] = icon;
           break;
         }
       }

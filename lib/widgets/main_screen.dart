@@ -13,6 +13,7 @@ class MainScreen extends StatefulWidget {
 class _MainScreenState extends State<MainScreen> {
   bool _searchInitiated = false;
   String _currentSearchQuery = "";
+  final ScrollController _scrollController = ScrollController();
 
   @override
   Widget build(BuildContext context) {
@@ -41,6 +42,7 @@ class _MainScreenState extends State<MainScreen> {
                   return Expanded(
                     flex: 999,
                     child: ListView.builder(
+                      controller: _scrollController,
                       itemCount: snapshot.data.length,
                       itemBuilder: (context, index) => VideoCard(
                         video: snapshot.data[index],
