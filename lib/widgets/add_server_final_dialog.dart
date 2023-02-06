@@ -2,9 +2,11 @@ import 'dart:convert';
 import 'dart:io';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:hydra_gui_app/providers/user_provider.dart';
 import 'package:hydra_gui_app/widgets/select_button.dart';
 import 'package:hydra_gui_app/widgets/setup_screen.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:provider/provider.dart';
 import '../data/guild.dart';
 import 'package:http/http.dart' as http;
 
@@ -36,12 +38,12 @@ class _AddServerFinalDialogState extends State<AddServerFinalDialog> {
             Row(
               mainAxisSize: MainAxisSize.min,
               children: [
-                Expanded(child: SizedBox(width: 1,)),
+                const Expanded(child: SizedBox(width: 1,)),
                 IconButton(
                   onPressed: () {
                     Navigator.pop(context);
                   },
-                  icon: Icon(
+                  icon: const Icon(
                     Icons.close,
                     color: Color(0xFFADADAD),
                     size: 20,
@@ -51,10 +53,10 @@ class _AddServerFinalDialogState extends State<AddServerFinalDialog> {
                 )
               ],
             ),
-            SizedBox(height: 7,),
+            const SizedBox(height: 7,),
             Row(
               children: [
-                SizedBox(width: 30,),
+                const SizedBox(width: 30,),
                 Container(
                   child: ClipRRect(
                     borderRadius: BorderRadius.circular(500),
@@ -62,7 +64,7 @@ class _AddServerFinalDialogState extends State<AddServerFinalDialog> {
                       width: 132,
                       height: 132,
                       imageUrl: "https://cdn.discordapp.com/icons/${widget.guild.id}/${widget.guild.icon}.webp?size=2048",
-                      placeholder: (context, url) => CircularProgressIndicator(
+                      placeholder: (context, url) => const CircularProgressIndicator(
                         color: Color(0xFF5E74FF),
                         strokeWidth: 3,
                       ),
@@ -70,21 +72,21 @@ class _AddServerFinalDialogState extends State<AddServerFinalDialog> {
                         child: Center(
                           child: Text(
                             widget.guild.name[0],
-                            style: TextStyle(
+                            style: const TextStyle(
                               fontSize: 48,
                               color: Color(0xFFD7D9DA),
                               fontFamily: "segoe"
                             ),
                           ),
                         ),
-                        decoration: BoxDecoration(
+                        decoration: const BoxDecoration(
                           color: Color(0xFF36393F),
                           borderRadius: BorderRadius.all(Radius.circular(40))
                         ),
                       ),
                     )
                   ),
-                  decoration: BoxDecoration(
+                  decoration: const BoxDecoration(
                     color: Color(0xFF36393F),
                     borderRadius: BorderRadius.all(Radius.circular(500)),
                     boxShadow: [
@@ -96,15 +98,15 @@ class _AddServerFinalDialogState extends State<AddServerFinalDialog> {
                     ]
                   ),
                 ),
-                Expanded(child: SizedBox(width: 1,)),
+                const Expanded(child: SizedBox(width: 1,)),
               ],
             ),
-            SizedBox(height: 19,),
+            const SizedBox(height: 19,),
             Container(
-              margin: EdgeInsets.symmetric(horizontal: 30),
+              margin: const EdgeInsets.symmetric(horizontal: 30),
               child: Text(
                 widget.guild.name,
-                style: TextStyle(
+                style: const TextStyle(
                   color: Color(0xFFADADAD),
                   fontSize: 43,
                   fontFamily: "segoe",
@@ -112,11 +114,11 @@ class _AddServerFinalDialogState extends State<AddServerFinalDialog> {
                 ),
               ),
             ),
-            SizedBox(height: 35,),
+            const SizedBox(height: 35,),
 
             // Channel ID Text Field
             Container(
-              margin: EdgeInsets.symmetric(horizontal: 30),
+              margin: const EdgeInsets.symmetric(horizontal: 30),
               child: Row(
                 children: [
                   const Text(
@@ -133,7 +135,7 @@ class _AddServerFinalDialogState extends State<AddServerFinalDialog> {
                       showDialog(
                         barrierColor: Colors.transparent,
                         context: context,
-                        builder: (context) => SetupStep1Dialog()
+                        builder: (context) => const SetupStep1Dialog()
                       );
                     },
                     child: const Text(
@@ -154,9 +156,9 @@ class _AddServerFinalDialogState extends State<AddServerFinalDialog> {
                 ],
               ),
             ),
-            SizedBox(height: 7,),
+            const SizedBox(height: 7,),
             Container(
-              margin: EdgeInsets.symmetric(horizontal: 30),
+              margin: const EdgeInsets.symmetric(horizontal: 30),
               child: TextField(
                 controller: _channelIdController,
                 style: const TextStyle(
@@ -168,11 +170,11 @@ class _AddServerFinalDialogState extends State<AddServerFinalDialog> {
                 cursorColor: const Color(0xFF5E74FF),
                 decoration: InputDecoration(
                   focusColor: const Color(0xFF5E74FF),
-                  errorStyle: TextStyle(height: 0),
+                  errorStyle: const TextStyle(height: 0),
                   errorText: _channelIdFieldValidate? " " : null,
-                  fillColor: Color(0xFF202225),
+                  fillColor: const Color(0xFF202225),
                   filled: true,
-                  contentPadding: EdgeInsets.all(10.0),
+                  contentPadding: const EdgeInsets.all(10.0),
                   enabledBorder: OutlineInputBorder(
                     borderSide: const BorderSide(color: Color(0xFF202225)),
                     borderRadius: BorderRadius.circular(5),
@@ -192,11 +194,11 @@ class _AddServerFinalDialogState extends State<AddServerFinalDialog> {
                 ),
               ),
             ),
-            SizedBox(height: 36,),
+            const SizedBox(height: 36,),
 
             Row(
               children: [
-                Expanded(child: SizedBox(width: 1,)),
+                const Expanded(child: SizedBox(width: 1,)),
                 SelectButton(
                   onPressed: () {
                     handleContinueButton();
@@ -204,20 +206,20 @@ class _AddServerFinalDialogState extends State<AddServerFinalDialog> {
                   text: "Continue",
                   width: 100,
                 ),
-                SizedBox(width: 30,)
+                const SizedBox(width: 30,)
               ],
             ),
-            SizedBox(height: 20,)
+            const SizedBox(height: 20,)
           ],
         ),
 
-        decoration: BoxDecoration(
+        decoration: const BoxDecoration(
           color: Color(0xFF2F3136),
           borderRadius: BorderRadius.all(Radius.circular(10)),
         ),
       ),
       backgroundColor: Colors.transparent,
-      shape: RoundedRectangleBorder(
+      shape: const RoundedRectangleBorder(
           borderRadius: BorderRadius.all(Radius.circular(10))),
     );
   }
@@ -243,7 +245,7 @@ class _AddServerFinalDialogState extends State<AddServerFinalDialog> {
     showDialog(
         barrierDismissible: false,
         context: context,
-        builder: (context) => SettingUpDialog()
+        builder: (context) => const SettingUpDialog()
     );
 
     String? messageId;
@@ -253,7 +255,7 @@ class _AddServerFinalDialogState extends State<AddServerFinalDialog> {
         headers: {
           "Content-Type": "application/json",
           "User-Agent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/44.0.2403.157 Safari/537.36",
-          "Authorization": MainApp.currentUser!.token
+          "Authorization": context.read<UserProvider>().currentUser!.token
         }
       );
 
@@ -264,12 +266,12 @@ class _AddServerFinalDialogState extends State<AddServerFinalDialog> {
         showDialog(
           context: context,
           builder: (context) => AlertDialog(
-            title: Text("Error Occured"),
+            title: const Text("Error Occured"),
             content: Text(e.toString()),
             actions: [
               MaterialButton(
                 onPressed: () => Navigator.pop(context),
-                child: Text("OK"),
+                child: const Text("OK"),
               )
             ],
           )
@@ -282,12 +284,12 @@ class _AddServerFinalDialogState extends State<AddServerFinalDialog> {
       showDialog(
         context: context,
         builder: (context) => AlertDialog(
-          title: Text("Request Timed Out"),
-          content: Text("Check you internet connection or try again later"),
+          title: const Text("Request Timed Out"),
+          content: const Text("Check you internet connection or try again later"),
           actions: [
             MaterialButton(
               onPressed: () => Navigator.pop(context),
-              child: Text("OK"),
+              child: const Text("OK"),
             )
           ],
         )
@@ -299,12 +301,12 @@ class _AddServerFinalDialogState extends State<AddServerFinalDialog> {
       showDialog(
         context: context,
         builder: (context) => AlertDialog(
-          title: Text("Error Occured"),
+          title: const Text("Error Occured"),
           content: Text(e.toString()),
           actions: [
             MaterialButton(
               onPressed: () => Navigator.pop(context),
-              child: Text("OK"),
+              child: const Text("OK"),
             )
           ],
         )
@@ -367,12 +369,12 @@ class SetupStep1Dialog extends StatelessWidget {
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            SizedBox(height: 10,),
+            const SizedBox(height: 10,),
             Row(
               mainAxisSize: MainAxisSize.min,
               children: [
-                Expanded(child: SizedBox(width: 1,)),
-                Text(
+                const Expanded(child: SizedBox(width: 1,)),
+                const Text(
                   "1) Enable Developer Mode",
                   style: TextStyle(
                       color: Color(0xFFADADAD),
@@ -381,12 +383,12 @@ class SetupStep1Dialog extends StatelessWidget {
                       fontSize: 17
                   ),
                 ),
-                Expanded(child: SizedBox(width: 1,)),
+                const Expanded(child: SizedBox(width: 1,)),
                 IconButton(
                   onPressed: () {
                     Navigator.pop(context);
                   },
-                  icon: Icon(
+                  icon: const Icon(
                     Icons.close,
                     color: Color(0xFFADADAD),
                     size: 20,
@@ -396,7 +398,7 @@ class SetupStep1Dialog extends StatelessWidget {
                 )
               ],
             ),
-            SizedBox(height: 30,),
+            const SizedBox(height: 30,),
             const Text(
               "           1) Open discord settings",
               style: TextStyle(
@@ -416,12 +418,12 @@ class SetupStep1Dialog extends StatelessWidget {
                   fontSize: 19
               ),
             ),
-            SizedBox(height: 25,),
+            const SizedBox(height: 25,),
             Container(
-              margin: EdgeInsets.symmetric(horizontal: 56),
+              margin: const EdgeInsets.symmetric(horizontal: 56),
               clipBehavior: Clip.antiAliasWithSaveLayer,
               child: Image.asset("assets/setup_step_1.png"),
-              decoration: BoxDecoration(
+              decoration: const BoxDecoration(
                 borderRadius: BorderRadius.all(Radius.circular(6)),
                 boxShadow: [
                   BoxShadow(
@@ -433,36 +435,36 @@ class SetupStep1Dialog extends StatelessWidget {
               ),
             ),
 
-            SizedBox(height: 30,),
+            const SizedBox(height: 30,),
             Row(
               children: [
-                Expanded(child: SizedBox(width: 1,)),
+                const Expanded(child: SizedBox(width: 1,)),
                 SelectButton(
                   onPressed: () {
                     Navigator.pop(context);
                     showDialog(
                       barrierColor: Colors.transparent,
                       context: context,
-                      builder: (context) => SetupStep2Dialog()
+                      builder: (context) => const SetupStep2Dialog()
                     );
                   },
                   text: "Next",
                   width: 88,
                 ),
-                SizedBox(width: 25,)
+                const SizedBox(width: 25,)
               ],
             ),
-            SizedBox(height: 20,)
+            const SizedBox(height: 20,)
           ],
         ),
 
-        decoration: BoxDecoration(
+        decoration: const BoxDecoration(
           color: Color(0xFF2F3136),
           borderRadius: BorderRadius.all(Radius.circular(10)),
         ),
       ),
       backgroundColor: Colors.transparent,
-      shape: RoundedRectangleBorder(
+      shape: const RoundedRectangleBorder(
           borderRadius: BorderRadius.all(Radius.circular(10))),
     );
   }
@@ -480,7 +482,7 @@ class SetupStep2Dialog extends StatelessWidget {
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            SizedBox(height: 10,),
+            const SizedBox(height: 10,),
             Row(
               mainAxisSize: MainAxisSize.min,
               children: [
@@ -494,7 +496,7 @@ class SetupStep2Dialog extends StatelessWidget {
                       fontSize: 17
                   ),
                 ),
-                Expanded(child: SizedBox(width: 1,)),
+                const Expanded(child: SizedBox(width: 1,)),
                 IconButton(
                   onPressed: () {
                     Navigator.pop(context);
@@ -529,12 +531,12 @@ class SetupStep2Dialog extends StatelessWidget {
                   fontSize: 19
               ),
             ),
-            SizedBox(height: 25,),
+            const SizedBox(height: 25,),
             Container(
-              margin: EdgeInsets.symmetric(horizontal: 56),
+              margin: const EdgeInsets.symmetric(horizontal: 56),
               clipBehavior: Clip.antiAliasWithSaveLayer,
               child: Image.asset("assets/setup_step_2.png"),
-              decoration: BoxDecoration(
+              decoration: const BoxDecoration(
                   borderRadius: BorderRadius.all(Radius.circular(6)),
                   boxShadow: [
                     BoxShadow(
@@ -546,10 +548,10 @@ class SetupStep2Dialog extends StatelessWidget {
               ),
             ),
 
-            SizedBox(height: 30,),
+            const SizedBox(height: 30,),
             Row(
               children: [
-                Expanded(child: SizedBox(width: 1,)),
+                const Expanded(child: SizedBox(width: 1,)),
                 SelectButton(
                   onPressed: () {
                     Navigator.pop(context);
@@ -557,20 +559,20 @@ class SetupStep2Dialog extends StatelessWidget {
                   text: "Done",
                   width: 88,
                 ),
-                SizedBox(width: 25,)
+                const SizedBox(width: 25,)
               ],
             ),
-            SizedBox(height: 20,)
+            const SizedBox(height: 20,)
           ],
         ),
 
-        decoration: BoxDecoration(
+        decoration: const BoxDecoration(
           color: Color(0xFF2F3136),
           borderRadius: BorderRadius.all(Radius.circular(10)),
         ),
       ),
       backgroundColor: Colors.transparent,
-      shape: RoundedRectangleBorder(
+      shape: const RoundedRectangleBorder(
           borderRadius: BorderRadius.all(Radius.circular(10))),
     );
   }

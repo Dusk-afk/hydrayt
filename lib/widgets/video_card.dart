@@ -1,10 +1,9 @@
 import 'dart:collection';
 
 import 'package:cached_network_image/cached_network_image.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:hydra_gui_app/main.dart';
-import 'package:hydra_gui_app/models/video_model.dart';
+import 'package:hydra_gui_app/providers/user_provider.dart';
+import 'package:hydra_gui_app/providers/video_model.dart';
 import 'package:hydra_gui_app/widgets/select_button.dart';
 import 'package:hydra_gui_app/widgets/server_button_network.dart';
 import 'package:hydra_gui_app/widgets/setup_screen.dart';
@@ -14,10 +13,10 @@ import 'package:youtube_explode_dart/youtube_explode_dart.dart';
 import 'package:http/http.dart' as http;
 
 class VideoCard extends StatelessWidget {
-  Video video;
-  BuildContext context;
+  final Video video;
+  final BuildContext context;
 
-  VideoCard({Key? key, required this.video, required this.context}) : super(key: key);
+  const VideoCard({Key? key, required this.video, required this.context}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -35,8 +34,8 @@ class VideoCard extends StatelessWidget {
     return Container(
       height: 140,
       // color: Colors.amber,
-      margin: EdgeInsets.symmetric(horizontal: 25, vertical: 5),
-      padding: EdgeInsets.all(5),
+      margin: const EdgeInsets.symmetric(horizontal: 25, vertical: 5),
+      padding: const EdgeInsets.all(5),
       child: Row(
         children: [
           Stack(
@@ -51,7 +50,7 @@ class VideoCard extends StatelessWidget {
                   child: CachedNetworkImage(
                     fit: BoxFit.cover,
                     imageUrl: video.thumbnails.highResUrl,
-                    placeholder: (context, url) => SizedBox(
+                    placeholder: (context, url) => const SizedBox(
                       width: 40,
                       height: 40,
                       child: CircularProgressIndicator(
@@ -60,7 +59,7 @@ class VideoCard extends StatelessWidget {
                       ),
                     ),
                     errorWidget: (context, url, error) => Container(
-                      child: Center(
+                      child: const Center(
                         child: Text(
                           "Thumbnail Not Loaded",
                           style: TextStyle(
@@ -69,7 +68,7 @@ class VideoCard extends StatelessWidget {
                           ),
                         ),
                       ),
-                      decoration: BoxDecoration(
+                      decoration: const BoxDecoration(
                         color: Color(0xFF36393F),
                         borderRadius: BorderRadius.all(Radius.circular(40))
                       ),
@@ -77,7 +76,7 @@ class VideoCard extends StatelessWidget {
                   ),
                 ),
 
-                decoration: BoxDecoration(
+                decoration: const BoxDecoration(
                   // color: Color(0xFF36393F),
                   //   color: Colors.amber,
                     borderRadius: BorderRadius.all(Radius.circular(10)),
@@ -93,12 +92,12 @@ class VideoCard extends StatelessWidget {
               Container(
                 width: 47,
                 height: 21,
-                margin: EdgeInsets.only(bottom: 9, right: 9),
+                margin: const EdgeInsets.only(bottom: 9, right: 9),
 
                 child: Center(
                   child: Text(
                     duration,
-                    style: TextStyle(
+                    style: const TextStyle(
                       color: Color(0xFFADADAD),
                       fontSize: 12,
                       fontFamily: "segoe",
@@ -107,7 +106,7 @@ class VideoCard extends StatelessWidget {
                   ),
                 ),
 
-                decoration: BoxDecoration(
+                decoration: const BoxDecoration(
                   color: Color(0xFF202225),
                   borderRadius: BorderRadius.all(Radius.circular(5)),
                   boxShadow: [
@@ -121,16 +120,16 @@ class VideoCard extends StatelessWidget {
               )
             ]
           ),
-          SizedBox(width: 25,),
+          const SizedBox(width: 25,),
           Expanded(
             child: Container(
-              padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
                   Text(
                     video.title,
-                    style: TextStyle(
+                    style: const TextStyle(
                       color: Color(0xFFADADAD),
                       fontSize: 19,
                       fontFamily: "segoe",
@@ -138,19 +137,19 @@ class VideoCard extends StatelessWidget {
                     ),
                     overflow: TextOverflow.ellipsis,
                   ),
-                  SizedBox(height: 8,),
+                  const SizedBox(height: 8,),
                   Text(
                     video.description,
-                    style: TextStyle(
+                    style: const TextStyle(
                       color: Color(0xFFADADAD),
                       fontSize: 9,
                       fontFamily: "segoe",
                     ),
                   ),
-                  Expanded(child: SizedBox(height: 8,)),
+                  const Expanded(child: SizedBox(height: 8,)),
                   Row(
                     children: [
-                      Text(
+                      const Text(
                         "by ",
                         style: TextStyle(
                           color: Color(0xFFADADAD),
@@ -160,14 +159,14 @@ class VideoCard extends StatelessWidget {
                       ),
                       Text(
                         video.author,
-                        style: TextStyle(
+                        style: const TextStyle(
                           color: Color(0xFFADADAD),
                           fontSize: 13,
                           fontFamily: "segoe",
                           fontWeight: FontWeight.bold
                         ),
                       ),
-                      Expanded(child: SizedBox(width: 1,)),
+                      const Expanded(child: SizedBox(width: 1,)),
                       SelectButton(
                         onPressed: () {
                           playButtonHandler();
@@ -180,7 +179,7 @@ class VideoCard extends StatelessWidget {
                 ],
               ),
 
-              decoration: BoxDecoration(
+              decoration: const BoxDecoration(
                 color: Color(0xFF36393F),
                 // color: Colors.red,
                 borderRadius: BorderRadius.all(Radius.circular(10)),
@@ -214,7 +213,7 @@ class VideoCard extends StatelessWidget {
 
     showDialog(
       context: context,
-      builder: (context) => SettingUpDialog(
+      builder: (context) => const SettingUpDialog(
         text: "Sending Request",
       )
     );
@@ -226,7 +225,7 @@ class VideoCard extends StatelessWidget {
     String streamingUrl = audios[audios.length - 1].url.toString();
     yt.close();
 
-    if (MainApp.currentUser == null){
+    if (context.read<UserProvider>().currentUser == null){
       Navigator.pop(context);
       showDialog(
         context: context,
@@ -238,13 +237,16 @@ class VideoCard extends StatelessWidget {
       );
       return;
     }
-    dynamic token = MainApp.currentUser?.token;
+    String token = context.read<UserProvider>().currentUser!.token;
 
     try{
-      Uri? apiRoute = ServerButtonNetwork.currentSelected?.getMessageUrl();
+      Uri apiRoute = ServerButtonNetwork.currentSelected!.getMessageUrl();
       http.Response response = await http.post(
-        apiRoute??=Uri.parse("default"),
-        headers: {"Authorization": token},
+        apiRoute,
+        headers: {
+          'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/80.0.3987.149 Safari/537.36',
+          "Authorization": token
+        },
         body: {"content":streamingUrl}
       );
 
@@ -259,6 +261,8 @@ class VideoCard extends StatelessWidget {
         );
       }
     }catch(e){
+      print(e);
+      Navigator.pop(context);
       showDialog(
         context: context,
         builder: (context) => CustomSimpleDialog(
@@ -270,6 +274,6 @@ class VideoCard extends StatelessWidget {
     }
 
     Navigator.pop(context);
-    context.read<VideoModel>().updateTrack(video, ServerButtonNetwork.currentSelected!);
+    context.read<VideoProvider>().updateTrack(video, ServerButtonNetwork.currentSelected!);
   }
 }

@@ -3,10 +3,12 @@ import 'package:flutter/material.dart';
 import 'package:hydra_gui_app/data/guild.dart';
 import 'package:hydra_gui_app/data/user.dart';
 import 'package:hydra_gui_app/main.dart';
+import 'package:hydra_gui_app/providers/user_provider.dart';
 import 'package:hydra_gui_app/widgets/add_server_final_dialog.dart';
 import 'package:hydra_gui_app/widgets/add_server_manually_dialog.dart';
 import 'package:hydra_gui_app/widgets/select_button.dart';
 import 'package:http/http.dart' as http;
+import 'package:provider/provider.dart';
 
 class AddServerDialog extends StatefulWidget {
   Function reload;
@@ -58,7 +60,7 @@ class _AddServerDialogState extends State<AddServerDialog> {
             SizedBox(height: 20,),
 
             FutureBuilder(
-              future: Guild.loadForUser(MainApp.currentUser!),
+              future: Guild.loadForUser(context.read<UserProvider>().currentUser!),
               builder: (context, AsyncSnapshot snapshot) {
                 if (!snapshot.hasData){
                   return const SizedBox(

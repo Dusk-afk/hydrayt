@@ -5,17 +5,20 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:hydra_gui_app/data/local_guild.dart';
 import 'package:hydra_gui_app/main.dart';
-import 'package:hydra_gui_app/models/guild_model.dart';
-import 'package:hydra_gui_app/models/video_model.dart';
+import 'package:hydra_gui_app/providers/guild_model.dart';
+import 'package:hydra_gui_app/providers/user_provider.dart';
+import 'package:hydra_gui_app/providers/video_model.dart';
 import 'package:hydra_gui_app/widgets/bottom_bar.dart';
+import 'package:hydra_gui_app/widgets/left_bar.dart';
 import 'package:hydra_gui_app/widgets/settings_screen.dart';
+import 'package:hydra_gui_app/widgets/title_bar.dart';
 import 'package:hydra_gui_app/widgets/video_card.dart';
 import 'package:provider/provider.dart';
 import 'package:youtube_explode_dart/youtube_explode_dart.dart';
 import 'package:http/http.dart' as http;
 
 class MainScreen extends StatefulWidget {
-  MainScreen({ Key? key }) : super(key: key);
+  const MainScreen({ Key? key }) : super(key: key);
 
   @override
   State<MainScreen> createState() => _MainScreenState();
@@ -27,164 +30,181 @@ class _MainScreenState extends State<MainScreen> {
   final ScrollController _scrollController = ScrollController();
   double height = 100;
 
+  bool _loading = true;
+  VideoSearchList? _searchResults;
+
   @override
   Widget build(BuildContext context) {
     height = appWindow.size.height;
-    Video? video = context.watch<VideoModel>().currentVideo;
+    Video? video = context.watch<VideoProvider>().currentVideo;
 
-    return Container(
-      width: double.infinity,
-      height: double.infinity,
-
-      child: Column(
-        mainAxisSize: MainAxisSize.max,
+    return Scaffold(
+      backgroundColor: const Color(0xFF202225),
+      body: Column(
         children: [
-          AppBar(
-            searchCallback: handleSearchRequest,
-            onClearPressed: () {
-              setState(() {
-                _searchInitiated = false;
-              });
-            },
-          ),
+          const TitleBar(),
 
-          _searchInitiated?
-          FutureBuilder(
-            future: getVideos(_currentSearchQuery),
-            builder: (context, AsyncSnapshot snapshot) {
-              if (snapshot.connectionState != ConnectionState.waiting) {
-                if (snapshot.hasData) {
-                  return Expanded(
-                    flex: 999,
-                    child: ListView.builder(
-                      controller: _scrollController,
-                      itemCount: snapshot.data.length,
-                      itemBuilder: (context, index) => VideoCard(
-                        video: snapshot.data[index],
-                        context: context,
-                      )
-                    ),
-                  );
-                }else{
-                  return Container(
-                    child: const Text("Looks like a error"),
-                  );
-                }
-              }
-              else{
-                return Container(
-                  width: 20,
-                  height: 20,
-                  margin: const EdgeInsets.only(top: 10),
-                  child: const CircularProgressIndicator(
-                    color: Color(0xFF5E74FF),
-                    strokeWidth: 3,
-                  ),
-                );
-              }
-            },
-          ) :
-          video==null? Container(
-            padding: const EdgeInsets.only(top: 5, right: 200),
-            width: 600,
-            child: Image.asset("assets/try_searching.png"),
-          ) : SizedBox(
-            height: height - 100,
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
+          Expanded(
+            child: Row(
               children: [
-                Container(
-                  clipBehavior: Clip.antiAliasWithSaveLayer,
-                  child: CachedNetworkImage(
-                    fit: BoxFit.fitHeight,
-                    width: 176,
-                    height: 176,
-                    imageUrl: "${video.thumbnails.highResUrl}",
-                    placeholder: (context, url) => const CircularProgressIndicator(
-                      color: Color(0xFF5E74FF),
-                      strokeWidth: 3,
-                    ),
-                    errorWidget: (context, url, error) => Container(
-                      child: const Center(
-                        child: Text(
-                          "?",
-                          style: TextStyle(
-                            fontSize: 16,
-                            color: Color(0xFFD7D9DA),
-                            fontFamily: "segoe"
+                const LeftBar(forSetupScreen: false),
+
+                Expanded(
+                  child: Container(
+                    width: double.infinity,
+                    height: double.infinity,
+                    
+                    child: Column(
+                      mainAxisSize: MainAxisSize.max,
+                      children: [
+                        AppBar(
+                          searchCallback: handleSearchRequest,
+                          onClearPressed: () {
+                            setState(() {
+                              _searchInitiated = false;
+                            });
+                          },
+                        ),
+                    
+                        _searchInitiated?
+                          _loading
+                            ? Container(
+                                width: 20,
+                                height: 20,
+                                margin: const EdgeInsets.only(top: 10),
+                                child: const CircularProgressIndicator(
+                                  color: Color(0xFF5E74FF),
+                                  strokeWidth: 3,
+                                ),
+                              )
+                            : Expanded(
+                                flex: 999,
+                                child: ListView.builder(
+                                  controller: _scrollController,
+                                  itemCount: _searchResults!.length,
+                                  itemBuilder: (context, index) => VideoCard(
+                                    video: _searchResults![index],
+                                    context: context,
+                                  )
+                                ),
+                              )
+                        :
+                        video==null? Container(
+                          padding: const EdgeInsets.only(top: 5, right: 200),
+                          width: 600,
+                          child: Image.asset("assets/try_searching.png"),
+                        ) : SizedBox(
+                          height: height - 100,
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Container(
+                                clipBehavior: Clip.antiAliasWithSaveLayer,
+                                child: CachedNetworkImage(
+                                  fit: BoxFit.fitHeight,
+                                  width: 176,
+                                  height: 176,
+                                  imageUrl: "${video.thumbnails.highResUrl}",
+                                  placeholder: (context, url) => const CircularProgressIndicator(
+                                    color: Color(0xFF5E74FF),
+                                    strokeWidth: 3,
+                                  ),
+                                  errorWidget: (context, url, error) => Container(
+                                    child: const Center(
+                                      child: Text(
+                                        "?",
+                                        style: TextStyle(
+                                          fontSize: 16,
+                                          color: Color(0xFFD7D9DA),
+                                          fontFamily: "segoe"
+                                        ),
+                                      ),
+                                    ),
+                                  )
+                                ),
+                                decoration: BoxDecoration(
+                                  color: const Color(0xFF36393F),
+                                  borderRadius: BorderRadius.circular(10),
+                                  boxShadow: [
+                                    const BoxShadow(
+                                      color: Color.fromARGB(80, 0, 0, 0),
+                                      blurRadius: 4,
+                                      offset: Offset(0, 4)
+                                    )
+                                  ]
+                                )
+                              ),
+                              const SizedBox(height: 20,),
+                              const Text(
+                                "Last Played",
+                                style: TextStyle(
+                                  color: Color(0xFFADADAD),
+                                  fontFamily: "segoe",
+                                  fontSize: 14,
+                                ),
+                              ),
+                              const SizedBox(height: 20,),
+                              Padding(
+                                padding: const EdgeInsets.symmetric(horizontal: 130),
+                                child: Text(
+                                  "${video.title}",
+                                  style: const TextStyle(
+                                    color: Color(0xFFADADAD),
+                                    fontFamily: "segoe",
+                                    fontSize: 21,
+                                    fontWeight: FontWeight.bold
+                                  ),
+                                  textAlign: TextAlign.center,
+                                ),
+                              ),
+                              const SizedBox(height: 35,),
+                              _MusicControls(),
+                              const SizedBox(height: 50,)
+                            ],
                           ),
                         ),
-                      ),
-                    )
-                  ),
-                  decoration: BoxDecoration(
-                    color: const Color(0xFF36393F),
-                    borderRadius: BorderRadius.circular(10),
-                    boxShadow: [
-                      const BoxShadow(
-                        color: Color.fromARGB(80, 0, 0, 0),
-                        blurRadius: 4,
-                        offset: Offset(0, 4)
-                      )
-                    ]
-                  )
-                ),
-                const SizedBox(height: 20,),
-                const Text(
-                  "Last Played",
-                  style: TextStyle(
-                    color: Color(0xFFADADAD),
-                    fontFamily: "segoe",
-                    fontSize: 14,
-                  ),
-                ),
-                const SizedBox(height: 20,),
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 130),
-                  child: Text(
-                    "${video.title}",
-                    style: const TextStyle(
-                      color: Color(0xFFADADAD),
-                      fontFamily: "segoe",
-                      fontSize: 21,
-                      fontWeight: FontWeight.bold
+                    
+                        const Spacer(flex: 1,),
+                    
+                        // Bottom Navigation Bar
+                        _searchInitiated || video==null? const BottomBar() : Container()
+                      ],
                     ),
-                    textAlign: TextAlign.center,
+                    
+                    decoration: const BoxDecoration(
+                      color: Color(0xFF36393F),
+                      borderRadius: BorderRadius.only(topLeft: Radius.circular(10))
+                    ),
                   ),
                 ),
-                const SizedBox(height: 35,),
-                _MusicControls(),
-                const SizedBox(height: 50,)
               ],
             ),
           ),
-
-          const Spacer(flex: 1,),
-
-          // Bottom Navigation Bar
-          _searchInitiated || video==null? const BottomBar() : Container()
         ],
-      ),
-
-      decoration: const BoxDecoration(
-        color: Color(0xFF36393F),
-        borderRadius: BorderRadius.only(topLeft: Radius.circular(10))
       ),
     );
   }
 
   void handleSearchRequest(String query) async {
     _currentSearchQuery = query;
-    setState(() {
-      _searchInitiated = true;
-    });
+    getVideos(query);
   }
 
-  Future<VideoSearchList> getVideos(String query) async {
+  Future getVideos(String query) async {
+    setState(() {
+      _searchInitiated = true;
+      _loading = true;
+      _searchResults = null;
+    });
+
     YoutubeExplode yt = YoutubeExplode();
     VideoSearchList list = await yt.search.search(query);
     yt.close();
-    return list;
+
+    setState(() {
+      _loading = false;
+      _searchResults = list;
+    });
   }
 }
 
@@ -325,7 +345,7 @@ class _MusicControlsState extends State<_MusicControls> {
 
   @override
   Widget build(BuildContext context) {
-    LocalGuild? localGuild = context.watch<GuildModel>().currentGuild;
+    LocalGuild? localGuild = context.watch<GuildProvider>().currentGuild;
 
     if (localGuild == null){
       _disabled = true;
@@ -333,7 +353,7 @@ class _MusicControlsState extends State<_MusicControls> {
 
     else if (localGuild.message_id == null){
       _disabled = true;
-      localGuild.tryUpdatingMessageId((success) {
+      localGuild.tryUpdatingMessageId(context.read<UserProvider>().currentUser!, (success) {
         if (success){
           setState(() {});
         }
@@ -352,24 +372,24 @@ class _MusicControlsState extends State<_MusicControls> {
             icon: Icons.replay,
             disabled: _disabled
         ),
-        const SizedBox(width: 12,),
-        MusicControlButton(
-            onClick: () => playPause(localGuild!),
-            imageIcon: Image.asset("assets/play_pause_icon.png"),
-            disabled: _disabled
-        ),
-        const SizedBox(width: 12,),
-        MusicControlButton(
-            onClick: () => stop(localGuild!),
-            icon: Icons.stop,
-            disabled: _disabled
-        ),
-        const SizedBox(width: 12,),
-        MusicControlButton(
-            onClick: () => skip(localGuild!),
-            icon: Icons.fast_forward,
-            disabled: _disabled
-        ),
+        // const SizedBox(width: 12,),
+        // MusicControlButton(
+        //     onClick: () => playPause(localGuild!),
+        //     imageIcon: Image.asset("assets/play_pause_icon.png"),
+        //     disabled: _disabled
+        // ),
+        // const SizedBox(width: 12,),
+        // MusicControlButton(
+        //     onClick: () => stop(localGuild!),
+        //     icon: Icons.stop,
+        //     disabled: _disabled
+        // ),
+        // const SizedBox(width: 12,),
+        // MusicControlButton(
+        //     onClick: () => skip(localGuild!),
+        //     icon: Icons.fast_forward,
+        //     disabled: _disabled
+        // ),
         const SizedBox(width: 12,),
         MusicControlButton(
           onClick: () {
@@ -388,7 +408,7 @@ class _MusicControlsState extends State<_MusicControls> {
   }
 
   Future replay(LocalGuild guild) async {
-    Video? video = context.read<VideoModel>().currentVideo;
+    Video? video = context.read<VideoProvider>().currentVideo;
 
     // Obtain Streaming Url
     YoutubeExplode yt = YoutubeExplode();
@@ -404,7 +424,7 @@ class _MusicControlsState extends State<_MusicControls> {
     try{
       http.Response response = await http.post(
           guild.getMessageUrl(),
-          headers: {"Authorization": "${MainApp.currentUser?.token}"},
+          headers: {"Authorization": "${context.read<UserProvider>().currentUser?.token}"},
           body: {"content": streamingUrl}
       );
     }catch(e){
@@ -416,7 +436,7 @@ class _MusicControlsState extends State<_MusicControls> {
     try{
       http.Response response = await http.put(
           guild.getPlayPauseReactUrl(),
-          headers: MainApp.currentUser?.getHeaders()
+          headers: context.read<UserProvider>().currentUser?.getHeaders()
       );
     }catch(e){
       print(e);
@@ -427,7 +447,7 @@ class _MusicControlsState extends State<_MusicControls> {
     try{
       http.Response response = await http.put(
           guild.getStopReactUrl(),
-          headers: MainApp.currentUser?.getHeaders()
+          headers: context.read<UserProvider>().currentUser?.getHeaders()
       );
     }catch(e){
       print(e);
@@ -438,7 +458,7 @@ class _MusicControlsState extends State<_MusicControls> {
     try{
       http.Response response = await http.put(
           guild.getSkipReactUrl(),
-          headers: MainApp.currentUser?.getHeaders()
+          headers: context.read<UserProvider>().currentUser?.getHeaders()
       );
     }catch(e){
       print(e);

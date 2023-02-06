@@ -3,17 +3,21 @@ import 'dart:io';
 import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:hydra_gui_app/data/user.dart';
+import 'package:hydra_gui_app/providers/setup_provider.dart';
+import 'package:hydra_gui_app/providers/user_provider.dart';
 import 'package:hydra_gui_app/services/token_grabber.dart';
 import 'package:hydra_gui_app/widgets/select_button.dart';
+import 'package:hydra_gui_app/widgets/title_bar.dart';
 import 'package:hydra_gui_app/widgets/user_select_dialog.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:provider/provider.dart';
 import 'package:win32/src/win32/crypt32.g.dart';
 
 import '../main.dart';
+import 'left_bar.dart';
 
 class SetupScreen extends StatefulWidget {
-  final Function onEnd;
-  const SetupScreen({ Key? key, required this.onEnd }) : super(key: key);
+  const SetupScreen({ Key? key }) : super(key: key);
 
   @override
   _SetupScreenState createState() => _SetupScreenState();
@@ -27,199 +31,218 @@ class _SetupScreenState extends State<SetupScreen>  with SingleTickerProviderSta
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      child: Column(
+    return Scaffold(
+      backgroundColor: const Color(0xFF202225),
+      body: Column(
         children: [
-          const AppBar(),
-          const Expanded(child: SizedBox(height: 1,)),
+          const TitleBar(),
+
           Expanded(
             child: Row(
               children: [
+                const LeftBar(forSetupScreen: true),
+                
                 Expanded(
                   child: Container(
-                    margin: const EdgeInsets.only(left: 80, right: 40),
-
                     child: Column(
                       children: [
-                        const SizedBox(height: 21,),
-                        const Text(
-                          "Automatic",
-                          style: TextStyle(
-                            fontSize: 25,
-                            fontFamily: "segoe",
-                            fontWeight: FontWeight.w600,
-                            color: Color(0xFFD5D5D5),
-                            letterSpacing: 2
+                        const AppBar(),
+                        const Expanded(child: SizedBox(height: 1,)),
+                        Expanded(
+                          child: Row(
+                            children: [
+                              Expanded(
+                                child: Container(
+                                  margin: const EdgeInsets.only(left: 80, right: 40),
+                    
+                                  child: Column(
+                                    children: [
+                                      const SizedBox(height: 21,),
+                                      const Text(
+                                        "Automatic",
+                                        style: TextStyle(
+                                          fontSize: 25,
+                                          fontFamily: "segoe",
+                                          fontWeight: FontWeight.w600,
+                                          color: Color(0xFFD5D5D5),
+                                          letterSpacing: 2
+                                        ),
+                                      ),
+                                      const SizedBox(height: 13,),
+                                      const Text(
+                                        "Gets your discord account token from this device",
+                                        style: TextStyle(
+                                          fontSize: 12,
+                                          fontFamily: "segoe",
+                                          fontWeight: FontWeight.w600,
+                                          color: Color(0xFFD5D5D5),
+                                        ),
+                                        textAlign: TextAlign.center,
+                                      ),
+                                      const Expanded(child: SizedBox(height: 1,)),
+                                      SelectButton(
+                                        onPressed: () {
+                                          handleButton(0);
+                                        },
+                                        enabled: _automaticOptionAvailable? true : false,
+                                        text: _automaticOptionAvailable? "Select" : "Unavailable",
+                                      ),
+                                      const SizedBox(height: 20,)
+                                    ],
+                                  ),
+                    
+                                  decoration: const BoxDecoration(
+                                    borderRadius: BorderRadius.all(Radius.circular(10)),
+                                    gradient: LinearGradient(
+                                      begin: Alignment.bottomLeft,
+                                      end: Alignment.topRight,
+                                      colors: [
+                                        Color(0xFF0B0A21),
+                                        Color(0xFF1B0247),
+                                      ]
+                                    ),
+                                    boxShadow: [
+                                      BoxShadow(
+                                        color: Color.fromARGB(30, 0, 0, 0),
+                                        blurRadius: 5,
+                                        offset: Offset(0, 5)
+                                      )
+                                    ]
+                                  ),
+                                ),
+                              ),
+                    
+                              Expanded(
+                                child: Container(
+                                  margin: const EdgeInsets.only(left: 40, right: 80),
+                    
+                                  child: Column(
+                                    children: [
+                                      const SizedBox(height: 21,),
+                                      const Text(
+                                        "Manual",
+                                        style: TextStyle(
+                                          fontSize: 25,
+                                          fontFamily: "segoe",
+                                          fontWeight: FontWeight.w600,
+                                          color: Color(0xFFD5D5D5),
+                                          letterSpacing: 2
+                                        ),
+                                      ),
+                                      const SizedBox(height: 13,),
+                                      _manualOptionSelected?
+                                      Container(
+                                        margin: const EdgeInsets.symmetric(horizontal: 23),
+                                        height: 35,
+                                        child: TextField(
+                                          controller: tokenTextFieldController,
+                                          style: const TextStyle(
+                                            color: Color(0xFF70747B),
+                                            fontSize: 12,
+                                            fontFamily: "segoe",
+                                            fontWeight: FontWeight.w600,
+                                          ),
+                                          cursorColor: const Color(0xFF5E74FF),
+                                          decoration: InputDecoration(
+                                            focusColor: const Color(0xFF5E74FF),
+                                            errorStyle: const TextStyle(height: 0),
+                                            errorText: _tokenTextFieldValidate? " " : null,
+                                            hintText: "Enter Token",
+                                            hintStyle: const TextStyle(
+                                              color: Color(0xFF70747B),
+                                              fontSize: 12,
+                                              fontFamily: "segoe",
+                                              fontWeight: FontWeight.w600,
+                                            ),
+                                            fillColor: const Color(0xFF202225),
+                                            filled: true,
+                                            contentPadding: const EdgeInsets.all(10.0),
+                                            enabledBorder: OutlineInputBorder(
+                                              borderSide: const BorderSide(
+                                                  color: Color(0xFF202225)
+                                              ),
+                                              borderRadius: BorderRadius.circular(5),
+                                            ),
+                                            focusedBorder: OutlineInputBorder(
+                                              borderSide: const BorderSide(
+                                                  color: Color(0xFF5E74FF)
+                                              ),
+                                              borderRadius: BorderRadius.circular(5),
+                                            ),
+                                            errorBorder: OutlineInputBorder(
+                                              borderSide: const BorderSide(
+                                                  color: Colors.red
+                                              ),
+                                              borderRadius: BorderRadius.circular(5),
+                                            ),
+                                            focusedErrorBorder: OutlineInputBorder(
+                                              borderSide: const BorderSide(
+                                                  color: Color(0xFF5E74FF)
+                                              ),
+                                              borderRadius: BorderRadius.circular(5),
+                                            ),
+                                          ),
+                                        ),
+                                      ) :
+                                      const Text(
+                                        "Manually type your discord Token\n(Ooooh such a pain)",
+                                        style: TextStyle(
+                                          fontSize: 12,
+                                          fontFamily: "segoe",
+                                          fontWeight: FontWeight.w600,
+                                          color: Color(0xFFD5D5D5),
+                                        ),
+                                        textAlign: TextAlign.center,
+                                      ),
+                                      const Expanded(child: SizedBox(height: 1,)),
+                                      SelectButton(
+                                        onPressed: () {
+                                          handleButton(1);
+                                        },
+                                        text: _manualOptionSelected? "Go" : "Select",
+                                      ),
+                                      const SizedBox(height: 20,)
+                                    ],
+                                  ),
+                    
+                                  decoration: const BoxDecoration(
+                                    borderRadius: BorderRadius.all(Radius.circular(10)),
+                                    gradient: LinearGradient(
+                                      begin: Alignment.bottomLeft,
+                                      end: Alignment.topRight,
+                                      colors: [
+                                        Color(0xFF2F3136),
+                                        Color(0xFF3A3C41),
+                                      ]
+                                    ),
+                                    boxShadow: [
+                                      BoxShadow(
+                                        color: Color.fromARGB(30, 0, 0, 0),
+                                        blurRadius: 5,
+                                        offset: Offset(0, 5)
+                                      )
+                                    ]
+                                  ),
+                                ),
+                              )
+                            ],
                           ),
-                        ),
-                        const SizedBox(height: 13,),
-                        const Text(
-                          "Gets your discord account token from this device",
-                          style: TextStyle(
-                            fontSize: 12,
-                            fontFamily: "segoe",
-                            fontWeight: FontWeight.w600,
-                            color: Color(0xFFD5D5D5),
-                          ),
-                          textAlign: TextAlign.center,
                         ),
                         const Expanded(child: SizedBox(height: 1,)),
-                        SelectButton(
-                          onPressed: () {
-                            handleButton(0);
-                          },
-                          enabled: _automaticOptionAvailable? true : false,
-                          text: _automaticOptionAvailable? "Select" : "Unavailable",
-                        ),
-                        const SizedBox(height: 20,)
                       ],
                     ),
-
+                    
                     decoration: const BoxDecoration(
-                      borderRadius: BorderRadius.all(Radius.circular(10)),
-                      gradient: LinearGradient(
-                        begin: Alignment.bottomLeft,
-                        end: Alignment.topRight,
-                        colors: [
-                          Color(0xFF0B0A21),
-                          Color(0xFF1B0247),
-                        ]
-                      ),
-                      boxShadow: [
-                        BoxShadow(
-                          color: Color.fromARGB(30, 0, 0, 0),
-                          blurRadius: 5,
-                          offset: Offset(0, 5)
-                        )
-                      ]
-                    ),
+                      color: Color(0xFF36393F),
+                      borderRadius: BorderRadius.only(topLeft: Radius.circular(10)),
+                    )
                   ),
                 ),
-
-                Expanded(
-                  child: Container(
-                    margin: const EdgeInsets.only(left: 40, right: 80),
-
-                    child: Column(
-                      children: [
-                        const SizedBox(height: 21,),
-                        const Text(
-                          "Manual",
-                          style: TextStyle(
-                            fontSize: 25,
-                            fontFamily: "segoe",
-                            fontWeight: FontWeight.w600,
-                            color: Color(0xFFD5D5D5),
-                            letterSpacing: 2
-                          ),
-                        ),
-                        const SizedBox(height: 13,),
-                        _manualOptionSelected?
-                        Container(
-                          margin: const EdgeInsets.symmetric(horizontal: 23),
-                          height: 35,
-                          child: TextField(
-                            controller: tokenTextFieldController,
-                            style: const TextStyle(
-                              color: Color(0xFF70747B),
-                              fontSize: 12,
-                              fontFamily: "segoe",
-                              fontWeight: FontWeight.w600,
-                            ),
-                            cursorColor: const Color(0xFF5E74FF),
-                            decoration: InputDecoration(
-                              focusColor: const Color(0xFF5E74FF),
-                              errorStyle: const TextStyle(height: 0),
-                              errorText: _tokenTextFieldValidate? " " : null,
-                              hintText: "Enter Token",
-                              hintStyle: const TextStyle(
-                                color: Color(0xFF70747B),
-                                fontSize: 12,
-                                fontFamily: "segoe",
-                                fontWeight: FontWeight.w600,
-                              ),
-                              fillColor: const Color(0xFF202225),
-                              filled: true,
-                              contentPadding: const EdgeInsets.all(10.0),
-                              enabledBorder: OutlineInputBorder(
-                                borderSide: const BorderSide(
-                                    color: Color(0xFF202225)
-                                ),
-                                borderRadius: BorderRadius.circular(5),
-                              ),
-                              focusedBorder: OutlineInputBorder(
-                                borderSide: const BorderSide(
-                                    color: Color(0xFF5E74FF)
-                                ),
-                                borderRadius: BorderRadius.circular(5),
-                              ),
-                              errorBorder: OutlineInputBorder(
-                                borderSide: const BorderSide(
-                                    color: Colors.red
-                                ),
-                                borderRadius: BorderRadius.circular(5),
-                              ),
-                              focusedErrorBorder: OutlineInputBorder(
-                                borderSide: const BorderSide(
-                                    color: Color(0xFF5E74FF)
-                                ),
-                                borderRadius: BorderRadius.circular(5),
-                              ),
-                            ),
-                          ),
-                        ) :
-                        const Text(
-                          "Manually type your discord Token\n(Ooooh such a pain)",
-                          style: TextStyle(
-                            fontSize: 12,
-                            fontFamily: "segoe",
-                            fontWeight: FontWeight.w600,
-                            color: Color(0xFFD5D5D5),
-                          ),
-                          textAlign: TextAlign.center,
-                        ),
-                        const Expanded(child: SizedBox(height: 1,)),
-                        SelectButton(
-                          onPressed: () {
-                            handleButton(1);
-                          },
-                          text: _manualOptionSelected? "Go" : "Select",
-                        ),
-                        const SizedBox(height: 20,)
-                      ],
-                    ),
-
-                    decoration: const BoxDecoration(
-                      borderRadius: BorderRadius.all(Radius.circular(10)),
-                      gradient: LinearGradient(
-                        begin: Alignment.bottomLeft,
-                        end: Alignment.topRight,
-                        colors: [
-                          Color(0xFF2F3136),
-                          Color(0xFF3A3C41),
-                        ]
-                      ),
-                      boxShadow: [
-                        BoxShadow(
-                          color: Color.fromARGB(30, 0, 0, 0),
-                          blurRadius: 5,
-                          offset: Offset(0, 5)
-                        )
-                      ]
-                    ),
-                  ),
-                )
               ],
             ),
           ),
-          const Expanded(child: SizedBox(height: 1,)),
         ],
       ),
-
-      decoration: const BoxDecoration(
-        color: Color(0xFF36393F),
-        borderRadius: BorderRadius.only(topLeft: Radius.circular(10)),
-      )
     );
   }
 
@@ -331,8 +354,8 @@ class _SetupScreenState extends State<SetupScreen>  with SingleTickerProviderSta
     Navigator.pop(context);
 
     // Close the setup screen
-    MainApp.currentUser = user;
-    widget.onEnd();
+    context.read<UserProvider>().setCurrentUser(user);
+    Navigator.pushNamed(context, "/main");
   }
 
   void showUserSelectDialog(List<User> users) {

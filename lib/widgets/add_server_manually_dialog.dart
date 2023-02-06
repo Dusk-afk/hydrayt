@@ -3,23 +3,25 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:hydra_gui_app/data/guild.dart';
 import 'package:hydra_gui_app/main.dart';
+import 'package:hydra_gui_app/providers/user_provider.dart';
 import 'package:hydra_gui_app/widgets/select_button.dart';
 import 'package:hydra_gui_app/widgets/setup_screen.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:http/http.dart' as http;
+import 'package:provider/provider.dart';
 
 class AddServerManuallyDialog extends StatefulWidget {
-  Function reload;
-  AddServerManuallyDialog({Key? key, required this.reload}) : super(key: key);
+  final Function reload;
+  const AddServerManuallyDialog({Key? key, required this.reload}) : super(key: key);
 
   @override
   _AddServerManuallyDialogState createState() => _AddServerManuallyDialogState();
 }
 
 class _AddServerManuallyDialogState extends State<AddServerManuallyDialog> {
-  TextEditingController _channelIdController = TextEditingController();
+  final TextEditingController _channelIdController = TextEditingController();
   bool _channelIdFieldValidate = false;
-  TextEditingController _serverIdController = TextEditingController();
+  final TextEditingController _serverIdController = TextEditingController();
   bool _serverIdFieldValidate = false;
 
   @override
@@ -341,7 +343,7 @@ class _AddServerManuallyDialogState extends State<AddServerManuallyDialog> {
         headers: {
           "Content-Type": "application/json",
           "User-Agent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/44.0.2403.157 Safari/537.36",
-          "Authorization": MainApp.currentUser!.token
+          "Authorization": context.read<UserProvider>().currentUser!.token
         }
       );
 

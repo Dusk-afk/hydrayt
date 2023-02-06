@@ -1,8 +1,11 @@
 import 'dart:convert';
 import 'dart:io';
+import 'package:hydra_gui_app/data/user.dart';
 import 'package:hydra_gui_app/main.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:http/http.dart' as http;
+
+import '../providers/user_provider.dart';
 
 class LocalGuild{
   String id;
@@ -41,14 +44,14 @@ class LocalGuild{
     return currentUserGuilds;
   }
 
-  Future tryUpdatingMessageId(Function(bool success)? callback) async {
+  Future tryUpdatingMessageId(User user, Function(bool success)? callback) async {
     try{
       http.Response response = await http.get(
           Uri.parse("https://discord.com/api/v9/channels/$channel_id/messages"),
           headers: {
             "Content-Type": "application/json",
             "User-Agent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/44.0.2403.157 Safari/537.36",
-            "Authorization": MainApp.currentUser!.token
+            "Authorization": user.token
           }
       );
 
@@ -101,12 +104,12 @@ class LocalGuild{
     await guildsFile.writeAsString(jsonEncode(jsonData));
   }
 
-  Future tryUpdatingIcon(Function(bool success)? callback) async {
+  Future tryUpdatingIcon(User user, Function(bool success)? callback) async {
     try{
       http.Response response = await http.get(
         Uri.parse("https://discordapp.com/api/v9/users/@me/guilds"),
         headers: {
-          "Authorization": "${MainApp.currentUser?.token}"
+          "Authorization": user.token
         }
       );
 

@@ -4,8 +4,9 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:hydra_gui_app/data/local_guild.dart';
 import 'package:hydra_gui_app/main.dart';
-import 'package:hydra_gui_app/models/guild_model.dart';
-import 'package:hydra_gui_app/models/video_model.dart';
+import 'package:hydra_gui_app/providers/guild_model.dart';
+import 'package:hydra_gui_app/providers/user_provider.dart';
+import 'package:hydra_gui_app/providers/video_model.dart';
 import 'package:hydra_gui_app/widgets/settings_screen.dart';
 import 'package:provider/provider.dart';
 import 'package:youtube_explode_dart/youtube_explode_dart.dart';
@@ -21,7 +22,7 @@ class BottomBar extends StatelessWidget {
 
       child: Row(
         children: [
-          Expanded(
+          const Expanded(
             child: _LastPlayedFrame(),
           ),
           Expanded(
@@ -59,7 +60,7 @@ class _MusicControlsState extends State<_MusicControls> {
 
   @override
   Widget build(BuildContext context) {
-    LocalGuild? localGuild = context.watch<GuildModel>().currentGuild;
+    LocalGuild? localGuild = context.watch<GuildProvider>().currentGuild;
 
     if (localGuild == null){
       _disabled = true;
@@ -67,7 +68,7 @@ class _MusicControlsState extends State<_MusicControls> {
 
     else if (localGuild.message_id == null){
       _disabled = true;
-      localGuild.tryUpdatingMessageId((success) {
+      localGuild.tryUpdatingMessageId(context.read<UserProvider>().currentUser!, (success) {
         if (success){
           setState(() {});
         }
@@ -80,49 +81,49 @@ class _MusicControlsState extends State<_MusicControls> {
 
     return Row(
       children: [
-        Spacer(),
+        const Spacer(),
         MusicControlButton(
           onClick: () => replay(localGuild!),
           icon: Icons.replay,
           disabled: _disabled
         ),
-        SizedBox(width: 12,),
-        MusicControlButton(
-          onClick: () => playPause(localGuild!),
-          imageIcon: Image.asset("assets/play_pause_icon.png"),
-          disabled: _disabled
-        ),
-        SizedBox(width: 12,),
-        MusicControlButton(
-          onClick: () => stop(localGuild!),
-          icon: Icons.stop,
-          disabled: _disabled
-        ),
-        SizedBox(width: 12,),
-        MusicControlButton(
-          onClick: () => skip(localGuild!),
-          icon: Icons.fast_forward,
-          disabled: _disabled
-        ),
-        SizedBox(width: 12,),
+        // const SizedBox(width: 12,),
+        // MusicControlButton(
+        //   onClick: () => playPause(localGuild!),
+        //   imageIcon: Image.asset("assets/play_pause_icon.png"),
+        //   disabled: _disabled
+        // ),
+        // const SizedBox(width: 12,),
+        // MusicControlButton(
+        //   onClick: () => stop(localGuild!),
+        //   icon: Icons.stop,
+        //   disabled: _disabled
+        // ),
+        // const SizedBox(width: 12,),
+        // MusicControlButton(
+        //   onClick: () => skip(localGuild!),
+        //   icon: Icons.fast_forward,
+        //   disabled: _disabled
+        // ),
+        const SizedBox(width: 12,),
         MusicControlButton(
           onClick: () {
             Navigator.push(
               context,
               MaterialPageRoute(
-                builder: (context) => SettingsScreen()
+                builder: (context) => const SettingsScreen()
               )
             );
           },
           icon: Icons.settings,
         ),
-        SizedBox(width: 20,)
+        const SizedBox(width: 20,)
       ],
     );
   }
 
   Future replay(LocalGuild guild) async {
-    Video? video = context.read<VideoModel>().currentVideo;
+    Video? video = context.read<VideoProvider>().currentVideo;
 
     // Obtain Streaming Url
     YoutubeExplode yt = YoutubeExplode();
@@ -138,7 +139,7 @@ class _MusicControlsState extends State<_MusicControls> {
     try{
       http.Response response = await http.post(
         guild.getMessageUrl(),
-        headers: {"Authorization": "${MainApp.currentUser?.token}"},
+        headers: {"Authorization": "${context.read<UserProvider>().currentUser?.token}"},
         body: {"content": streamingUrl}
       );
     }catch(e){
@@ -150,7 +151,7 @@ class _MusicControlsState extends State<_MusicControls> {
     try{
       http.Response response = await http.put(
         guild.getPlayPauseReactUrl(),
-        headers: MainApp.currentUser?.getHeaders()
+        headers: context.read<UserProvider>().currentUser?.getHeaders()
       );
     }catch(e){
       print(e);
@@ -161,7 +162,7 @@ class _MusicControlsState extends State<_MusicControls> {
     try{
       http.Response response = await http.put(
         guild.getStopReactUrl(),
-        headers: MainApp.currentUser?.getHeaders()
+        headers: context.read<UserProvider>().currentUser?.getHeaders()
       );
     }catch(e){
       print(e);
@@ -172,7 +173,7 @@ class _MusicControlsState extends State<_MusicControls> {
     try{
       http.Response response = await http.put(
         guild.getSkipReactUrl(),
-        headers: MainApp.currentUser?.getHeaders()
+        headers: context.read<UserProvider>().currentUser?.getHeaders()
       );
     }catch(e){
       print(e);
@@ -205,7 +206,7 @@ class MusicControlButtonState extends State<MusicControlButton> {
           _pressed = true;
         });
 
-        Future.delayed(Duration(milliseconds: 300), () {
+        Future.delayed(const Duration(milliseconds: 300), () {
           setState(() {
             _pressed = false;
           });
@@ -225,13 +226,13 @@ class MusicControlButtonState extends State<MusicControlButton> {
           });
         },
         child: AnimatedContainer(
-          duration: Duration(milliseconds: 100),
+          duration: const Duration(milliseconds: 100),
           width: 45,
           height: 45,
 
           child: widget.imageIcon==null? Icon(
             widget.icon,
-            color: Color(0xFFADADAD),
+            color: const Color(0xFFADADAD),
             size: 20,
           ) : Padding(
             padding: const EdgeInsets.all(10),
@@ -239,11 +240,11 @@ class MusicControlButtonState extends State<MusicControlButton> {
           ),
 
           decoration: BoxDecoration(
-            color: widget.disabled? Color(0xFF2B2E33) : Color(_hovered? 0xFF575C67 : 0xFF36393F),
+            color: widget.disabled? const Color(0xFF2B2E33) : Color(_hovered? 0xFF575C67 : 0xFF36393F),
             borderRadius: BorderRadius.circular(300),
             boxShadow: widget.disabled? null : [
               BoxShadow(
-                color: Color.fromARGB(50, 0, 0, 0),
+                color: const Color.fromARGB(50, 0, 0, 0),
                 blurRadius: _pressed? 0 : 4,
                 offset: Offset(0, _pressed? 0 : 4)
               )
@@ -267,8 +268,8 @@ class _LastPlayedFrame extends StatefulWidget {
 class _LastPlayedFrameState extends State<_LastPlayedFrame> {
   @override
   Widget build(BuildContext context) {
-    Video? video = context.watch<VideoModel>().currentVideo;
-    LocalGuild? guild = context.read<VideoModel>().currentVideoGuild;
+    Video? video = context.watch<VideoProvider>().currentVideo;
+    LocalGuild? guild = context.read<VideoProvider>().currentVideoGuild;
     String title = video!=null? video.title.length >= 30? video.title.substring(0, 30) + "..." : video.title : "";
 
     return Padding(
@@ -290,7 +291,7 @@ class _LastPlayedFrameState extends State<_LastPlayedFrame> {
                       child: CachedNetworkImage(
                         fit: BoxFit.cover,
                         imageUrl: video.thumbnails.highResUrl,
-                        placeholder: (context, url) => SizedBox(
+                        placeholder: (context, url) => const SizedBox(
                           width: 40,
                           height: 40,
                           child: CircularProgressIndicator(
@@ -299,7 +300,7 @@ class _LastPlayedFrameState extends State<_LastPlayedFrame> {
                           ),
                         ),
                         errorWidget: (context, url, error) => Container(
-                          child: Center(
+                          child: const Center(
                             child: Text(
                               "Thumbnail Not Loaded",
                               style: TextStyle(
@@ -308,7 +309,7 @@ class _LastPlayedFrameState extends State<_LastPlayedFrame> {
                               ),
                             ),
                           ),
-                          decoration: BoxDecoration(
+                          decoration: const BoxDecoration(
                             color: Color(0xFF36393F),
                             borderRadius: BorderRadius.all(Radius.circular(40)),
                           ),
@@ -337,7 +338,7 @@ class _LastPlayedFrameState extends State<_LastPlayedFrame> {
                           width: 32,
                           height: 32,
                           imageUrl: "https://cdn.discordapp.com/icons/${guild?.id}/${guild?.icon}.webp?size=64",
-                          placeholder: (context, url) => CircularProgressIndicator(
+                          placeholder: (context, url) => const CircularProgressIndicator(
                             color: Color(0xFF5E74FF),
                             strokeWidth: 3,
                           ),
@@ -345,7 +346,7 @@ class _LastPlayedFrameState extends State<_LastPlayedFrame> {
                             child: Center(
                               child: Text(
                                 "${guild?.name[0]}",
-                                style: TextStyle(
+                                style: const TextStyle(
                                   fontSize: 16,
                                   color: Color(0xFFD7D9DA),
                                   fontFamily: "segoe"
@@ -355,10 +356,10 @@ class _LastPlayedFrameState extends State<_LastPlayedFrame> {
                           )
                       ),
                       decoration: BoxDecoration(
-                        color: Color(0xFF36393F),
+                        color: const Color(0xFF36393F),
                         borderRadius: BorderRadius.circular(300),
                         boxShadow: [
-                          BoxShadow(
+                          const BoxShadow(
                               color: Color.fromARGB(80, 0, 0, 0),
                               blurRadius: 4,
                               offset: Offset(0, 4)
@@ -417,10 +418,10 @@ class _LastPlayedFrameState extends State<_LastPlayedFrame> {
                 )
               ),
               decoration: BoxDecoration(
-                color: Color(0xFF202225),
+                color: const Color(0xFF202225),
                 borderRadius: BorderRadius.circular(2),
                 boxShadow: [
-                  BoxShadow(
+                  const BoxShadow(
                     color: Color.fromARGB(20, 0, 0, 0),
                     offset: Offset(0, 3),
                     blurRadius: 3

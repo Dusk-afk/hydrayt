@@ -5,8 +5,10 @@ import 'dart:io';
 import 'package:bitsdojo_window/bitsdojo_window.dart';
 import 'package:flutter/material.dart';
 import 'package:hydra_gui_app/data/user.dart';
-import 'package:hydra_gui_app/models/guild_model.dart';
-import 'package:hydra_gui_app/models/video_model.dart';
+import 'package:hydra_gui_app/providers/guild_model.dart';
+import 'package:hydra_gui_app/providers/setup_provider.dart';
+import 'package:hydra_gui_app/providers/user_provider.dart';
+import 'package:hydra_gui_app/providers/video_model.dart';
 import 'package:hydra_gui_app/widgets/left_bar.dart';
 import 'package:hydra_gui_app/widgets/main_screen.dart';
 import 'package:hydra_gui_app/widgets/setup_screen.dart';
@@ -14,21 +16,51 @@ import 'package:hydra_gui_app/widgets/title_bar.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:provider/provider.dart';
 
-void main() {
+Future<User?> getUserData() async {
+  // Getting Directory of user data
+  Directory userDir = Directory((await getApplicationDocumentsDirectory()).path + "\\HydraYTBot");
+  // Getting user file inside this directory
+  File userFile = File(userDir.path + "\\user.dk");
+
+  // If this file doesn't exist then show setup screen
+  if (!(await userFile.exists())){
+    return null;
+  }
+
+  String token = await userFile.readAsString();
+  User user = User.fromToken(token);
+  await user.init();
+  return user.isValid? user : null;
+}
+
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+
+  User? user = await getUserData();
+  UserProvider userProvider = UserProvider();
+  if (user != null) {
+    userProvider.setCurrentUser(user);
+  }
+
   runApp(
     MultiProvider(
       providers: [
-        ChangeNotifierProvider(create: (_) => VideoModel()),
-        ChangeNotifierProvider(create: (_) => GuildModel()),
+        ChangeNotifierProvider(create: (_) => VideoProvider()),
+        ChangeNotifierProvider(create: (_) => GuildProvider()),
+        ChangeNotifierProvider(create: (_) => userProvider),
       ],
       child: MaterialApp(
         debugShowCheckedModeBanner: false,
-        home: MainApp(),
+        routes: {
+          "/main" : (context) => MainScreen(),
+          "/setup" : (context) => SetupScreen()
+        },
+        home: user == null? SetupScreen() : MainScreen(),
 
         theme: ThemeData(
           textTheme: TextTheme(
             // AppBar Text
-            headline1: TextStyle(
+            displayLarge: TextStyle(
               fontSize: 17,
               fontFamily: "segoe",
               fontWeight: FontWeight.w600,
@@ -47,91 +79,4 @@ void main() {
     appWindow.title = "HydraYT";
     appWindow.show();
   });
-}
-
-class MainApp extends StatefulWidget {
-  static bool showSetupScreen = false;
-  static User? currentUser;
-
-  MainApp({Key? key}) : super(key: key);
-
-  @override
-  State<MainApp> createState() => _MainAppState();
-}
-
-class _MainAppState extends State<MainApp> {
-  @override
-  void initState() {
-    super.initState();
-    checkForUserData();
-  }
-
-  checkForUserData() async {
-    // Getting Directory of user data
-    Directory userDir = Directory((await getApplicationDocumentsDirectory()).path + "\\HydraYTBot");
-
-    // If this directory doesn't exist then show setup screen
-    if (!(await userDir.exists())){
-      // print("Directory doesn't exist");
-      setState(() {
-        MainApp.showSetupScreen = true;
-      });
-      return;
-    }
-
-    // Getting user file inside this directory
-    File userFile = File(userDir.path + "\\user.dk");
-
-    // If this file doesn't exist then show setup screen
-    if (!(await userFile.exists())){
-      // print("File doesn't exist");
-      setState(() {
-        MainApp.showSetupScreen = true;
-      });
-      return;
-    }
-
-    MainApp.currentUser = await getUser(userFile);
-    if (MainApp.currentUser == null){
-      setState(() {
-        MainApp.showSetupScreen = true;
-      });
-      return;
-    }
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Color(0xFF202225),
-      body: Column(
-        children: [
-          TitleBar(),
-          Expanded(
-            child: Row(
-              children: [
-                LeftBar(),
-                Expanded(
-                  child: MainApp.showSetupScreen? SetupScreen(
-                    onEnd: () {
-                      setState(() {
-                        MainApp.showSetupScreen = false;
-                      });
-                    },
-                  ) : MainScreen()
-                )
-              ],
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Future<User?> getUser(File userFile) async {
-    String token = await userFile.readAsString();
-    User user = User.fromToken(token);
-    await user.init();
-    return user.isValid? user : null;
-  }
 }

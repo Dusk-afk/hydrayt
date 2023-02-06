@@ -1,7 +1,8 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:hydra_gui_app/data/guild.dart';
-import 'package:hydra_gui_app/models/guild_model.dart';
+import 'package:hydra_gui_app/providers/guild_model.dart';
+import 'package:hydra_gui_app/providers/user_provider.dart';
 import 'package:native_context_menu/native_context_menu.dart';
 import 'package:provider/provider.dart';
 import '../data/local_guild.dart';
@@ -29,10 +30,10 @@ class _ServerButtonNetworkState extends State<ServerButtonNetwork> {
     return Row(
       children: [
         AnimatedContainer(
-          duration: Duration(milliseconds: 100),
+          duration: const Duration(milliseconds: 100),
           width: 4,
           height: ServerButtonNetwork.currentSelected == null? _hovered? 16 : 0 : ServerButtonNetwork.currentSelected!.channel_id == widget.guild.channel_id? 40 : _hovered? 16 : 0,
-          decoration: BoxDecoration(
+          decoration: const BoxDecoration(
             color: Colors.white,
             borderRadius: BorderRadius.only(
               topRight: Radius.circular(3),
@@ -40,7 +41,7 @@ class _ServerButtonNetworkState extends State<ServerButtonNetwork> {
             )
           ),
         ),
-        SizedBox(width: 8,),
+        const SizedBox(width: 8,),
         MouseRegion(
           cursor: widget.enabled? SystemMouseCursors.click : SystemMouseCursors.basic,
           onEnter: (_) {
@@ -55,7 +56,7 @@ class _ServerButtonNetworkState extends State<ServerButtonNetwork> {
           },
           child: GestureDetector(
               onTap: () {
-                context.read<GuildModel>().changeGuild(widget.guild);
+                context.read<GuildProvider>().changeGuild(widget.guild);
                 setState(() {
                   if (ServerButtonNetwork.currentSelected != widget.guild){
                     ServerButtonNetwork.currentSelected = widget.guild;
@@ -71,7 +72,7 @@ class _ServerButtonNetworkState extends State<ServerButtonNetwork> {
               child: AnimatedContainer(
                 width: 48,
                 height: 48,
-                duration: Duration(milliseconds: 100),
+                duration: const Duration(milliseconds: 100),
 
                 clipBehavior: Clip.antiAliasWithSaveLayer,
 
@@ -79,12 +80,12 @@ class _ServerButtonNetworkState extends State<ServerButtonNetwork> {
                   width: 48,
                   height: 48,
                   imageUrl: "https://cdn.discordapp.com/icons/${widget.guild.id}/${widget.guild.icon}.webp?size=64",
-                  placeholder: (context, url) => CircularProgressIndicator(
+                  placeholder: (context, url) => const CircularProgressIndicator(
                     color: Color(0xFF5E74FF),
                     strokeWidth: 3,
                   ),
                   errorWidget: (context, url, error) {
-                    widget.guild.tryUpdatingIcon((success) {
+                    widget.guild.tryUpdatingIcon(context.read<UserProvider>().currentUser!, (success) {
                       if (success){
                         setState(() {});
                       }
@@ -93,7 +94,7 @@ class _ServerButtonNetworkState extends State<ServerButtonNetwork> {
                       child: Center(
                         child: Text(
                           widget.guild.name[0],
-                          style: TextStyle(
+                          style: const TextStyle(
                             fontSize: 16,
                             color: Color(0xFFD7D9DA),
                             fontFamily: "segoe"
@@ -105,7 +106,7 @@ class _ServerButtonNetworkState extends State<ServerButtonNetwork> {
                 ),
 
                 decoration: BoxDecoration(
-                  color: Color(0xFF36393F),
+                  color: const Color(0xFF36393F),
                   borderRadius: BorderRadius.all(  //widget.enabled? (_hovered? 18 : 25) : 25)
                     Radius.circular(
                       widget.enabled?
