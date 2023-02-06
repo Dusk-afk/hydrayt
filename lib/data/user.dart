@@ -50,10 +50,9 @@ class User{
 
   Future<dynamic> getData() async {
     http.Response response = await http.get(
-      Uri.parse("https://discordapp.com/api/v6/users/@me"),
+      Uri.parse("https://discordapp.com/api/v9/users/@me"),
       headers: getHeaders()
     );
-
     return jsonDecode(response.body);
   }
 
@@ -88,7 +87,7 @@ class User{
   Map<String, String> getHeaders(){
     return {
       "Content-Type": "application/json",
-      "User-Agent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/44.0.2403.157 Safari/537.36",
+      "User-Agent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.11 (KHTML, like Gecko) Chrome/23.0.1271.64 Safari/537.11",
       "Authorization": token
     };
   }

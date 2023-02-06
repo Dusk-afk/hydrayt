@@ -67,7 +67,7 @@ class _MainScreenState extends State<MainScreen> {
                   );
                 }else{
                   return Container(
-                    child: Text("Looks like a error"),
+                    child: const Text("Looks like a error"),
                   );
                 }
               }
@@ -75,8 +75,8 @@ class _MainScreenState extends State<MainScreen> {
                 return Container(
                   width: 20,
                   height: 20,
-                  margin: EdgeInsets.only(top: 10),
-                  child: CircularProgressIndicator(
+                  margin: const EdgeInsets.only(top: 10),
+                  child: const CircularProgressIndicator(
                     color: Color(0xFF5E74FF),
                     strokeWidth: 3,
                   ),
@@ -100,12 +100,12 @@ class _MainScreenState extends State<MainScreen> {
                     width: 176,
                     height: 176,
                     imageUrl: "${video.thumbnails.highResUrl}",
-                    placeholder: (context, url) => CircularProgressIndicator(
+                    placeholder: (context, url) => const CircularProgressIndicator(
                       color: Color(0xFF5E74FF),
                       strokeWidth: 3,
                     ),
                     errorWidget: (context, url, error) => Container(
-                      child: Center(
+                      child: const Center(
                         child: Text(
                           "?",
                           style: TextStyle(
@@ -118,10 +118,10 @@ class _MainScreenState extends State<MainScreen> {
                     )
                   ),
                   decoration: BoxDecoration(
-                    color: Color(0xFF36393F),
+                    color: const Color(0xFF36393F),
                     borderRadius: BorderRadius.circular(10),
                     boxShadow: [
-                      BoxShadow(
+                      const BoxShadow(
                         color: Color.fromARGB(80, 0, 0, 0),
                         blurRadius: 4,
                         offset: Offset(0, 4)
@@ -129,8 +129,8 @@ class _MainScreenState extends State<MainScreen> {
                     ]
                   )
                 ),
-                SizedBox(height: 20,),
-                Text(
+                const SizedBox(height: 20,),
+                const Text(
                   "Last Played",
                   style: TextStyle(
                     color: Color(0xFFADADAD),
@@ -138,12 +138,12 @@ class _MainScreenState extends State<MainScreen> {
                     fontSize: 14,
                   ),
                 ),
-                SizedBox(height: 20,),
+                const SizedBox(height: 20,),
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 130),
                   child: Text(
                     "${video.title}",
-                    style: TextStyle(
+                    style: const TextStyle(
                       color: Color(0xFFADADAD),
                       fontFamily: "segoe",
                       fontSize: 21,
@@ -152,21 +152,21 @@ class _MainScreenState extends State<MainScreen> {
                     textAlign: TextAlign.center,
                   ),
                 ),
-                SizedBox(height: 35,),
+                const SizedBox(height: 35,),
                 _MusicControls(),
-                SizedBox(height: 50,)
+                const SizedBox(height: 50,)
               ],
             ),
           ),
 
-          Spacer(flex: 1,),
+          const Spacer(flex: 1,),
 
           // Bottom Navigation Bar
-          _searchInitiated || video==null? BottomBar() : Container()
+          _searchInitiated || video==null? const BottomBar() : Container()
         ],
       ),
 
-      decoration: BoxDecoration(
+      decoration: const BoxDecoration(
         color: Color(0xFF36393F),
         borderRadius: BorderRadius.only(topLeft: Radius.circular(10))
       ),
@@ -180,19 +180,19 @@ class _MainScreenState extends State<MainScreen> {
     });
   }
 
-  Future<SearchList> getVideos(String query) async {
+  Future<VideoSearchList> getVideos(String query) async {
     YoutubeExplode yt = YoutubeExplode();
-    SearchList list = await yt.search.getVideos(query);
+    VideoSearchList list = await yt.search.search(query);
     yt.close();
     return list;
   }
 }
 
 class AppBar extends StatefulWidget {
-  Function searchCallback;
-  Function onClearPressed;
+  final Function searchCallback;
+  final Function onClearPressed;
 
-  AppBar({ Key? key , required this.searchCallback, required this.onClearPressed}) : super(key: key);
+  const AppBar({ Key? key , required this.searchCallback, required this.onClearPressed}) : super(key: key);
 
   @override
   _AppBarState createState() => _AppBarState();
@@ -208,10 +208,10 @@ class _AppBarState extends State<AppBar> {
     return Container(
         width: double.infinity,
         height: 58,
-        margin: EdgeInsets.only(bottom: 5),
+        margin: const EdgeInsets.only(bottom: 5),
 
         child: Container(
-          margin: EdgeInsets.symmetric(vertical: 13, horizontal: 21),
+          margin: const EdgeInsets.symmetric(vertical: 13, horizontal: 21),
           child: Row(
             children: [
               Expanded(
@@ -228,9 +228,9 @@ class _AppBarState extends State<AppBar> {
                   cursorColor: const Color(0xFF5E74FF),
                   decoration: InputDecoration(
                     focusColor: const Color(0xFF5E74FF),
-                    errorStyle: TextStyle(height: 0),
+                    errorStyle: const TextStyle(height: 0),
                     errorText: _searchFieldValidate? " " : null,
-                    fillColor: Color(0xFF202225),
+                    fillColor: const Color(0xFF202225),
                     filled: true,
                     hintText: "Enter Query or URL",
                     hintStyle: const TextStyle(
@@ -239,7 +239,7 @@ class _AppBarState extends State<AppBar> {
                       fontFamily: "segoe",
                       fontWeight: FontWeight.w600,
                     ),
-                    contentPadding: EdgeInsets.all(10.0),
+                    contentPadding: const EdgeInsets.all(10.0),
                     enabledBorder: OutlineInputBorder(
                       borderSide: const BorderSide(color: Color(0xFF202225)),
                       borderRadius: BorderRadius.circular(5),
@@ -259,11 +259,11 @@ class _AppBarState extends State<AppBar> {
                   ),
                 ),
               ),
-              SizedBox(width: 15,),
+              const SizedBox(width: 15,),
               SearchButton(
                 onPressed: () {searchButtonHandler();},
               ),
-              Expanded(flex: 5, child: SizedBox(width: 1,)),
+              const Expanded(flex: 5, child: SizedBox(width: 1,)),
               ClearButton(
                 onPressed: () {
                   clearButtonHandler();
@@ -346,43 +346,43 @@ class _MusicControlsState extends State<_MusicControls> {
 
     return Row(
       children: [
-        Spacer(),
+        const Spacer(),
         MusicControlButton(
             onClick: () => replay(localGuild!),
             icon: Icons.replay,
             disabled: _disabled
         ),
-        SizedBox(width: 12,),
+        const SizedBox(width: 12,),
         MusicControlButton(
             onClick: () => playPause(localGuild!),
             imageIcon: Image.asset("assets/play_pause_icon.png"),
             disabled: _disabled
         ),
-        SizedBox(width: 12,),
+        const SizedBox(width: 12,),
         MusicControlButton(
             onClick: () => stop(localGuild!),
             icon: Icons.stop,
             disabled: _disabled
         ),
-        SizedBox(width: 12,),
+        const SizedBox(width: 12,),
         MusicControlButton(
             onClick: () => skip(localGuild!),
             icon: Icons.fast_forward,
             disabled: _disabled
         ),
-        SizedBox(width: 12,),
+        const SizedBox(width: 12,),
         MusicControlButton(
           onClick: () {
             Navigator.push(
               context,
               MaterialPageRoute(
-                builder: (context) => SettingsScreen()
+                builder: (context) => const SettingsScreen()
               )
             );
           },
           icon: Icons.settings,
         ),
-        Spacer()
+        const Spacer()
       ],
     );
   }
@@ -447,9 +447,9 @@ class _MusicControlsState extends State<_MusicControls> {
 }
 
 class SearchButton extends StatefulWidget {
-  Function onPressed;
+  final Function onPressed;
 
-  SearchButton({ Key? key, required this.onPressed}) : super(key: key);
+  const SearchButton({ Key? key, required this.onPressed}) : super(key: key);
 
   @override
   _SearchButtonState createState() => _SearchButtonState();
@@ -476,24 +476,24 @@ class _SearchButtonState extends State<SearchButton> {
           });
         },
         child: AnimatedContainer(
-          duration: Duration(milliseconds: 100),
+          duration: const Duration(milliseconds: 100),
           width: 80,
           height: 35,
           child: Center(
             child: AnimatedDefaultTextStyle(
-              duration: Duration(milliseconds: 100),
-              child: Text("Search"),
+              duration: const Duration(milliseconds: 100),
+              child: const Text("Search"),
               style: TextStyle(
                 fontSize: 12,
                 fontFamily: "segoe",
                 fontWeight: FontWeight.w600,
-                color: isHovered? Colors.white : Color(0xFF72767D),
+                color: isHovered? Colors.white : const Color(0xFF72767D),
               ),
             ),
           ),
 
           decoration: BoxDecoration(
-            color: isHovered? Color(0xFF555555) : Color(0xFF202225),
+            color: isHovered? const Color(0xFF555555) : const Color(0xFF202225),
             borderRadius: const BorderRadius.all(Radius.circular(5))
           ),
         ),
@@ -503,10 +503,10 @@ class _SearchButtonState extends State<SearchButton> {
 }
 
 class ClearButton extends StatefulWidget {
-  Function onPressed;
-  bool hidden;
+  final Function onPressed;
+  final bool hidden;
 
-  ClearButton({Key? key, required this.onPressed, this.hidden = false}) : super(key: key);
+  const ClearButton({Key? key, required this.onPressed, this.hidden = false}) : super(key: key);
 
   @override
   _ClearButtonState createState() => _ClearButtonState();
@@ -533,24 +533,24 @@ class _ClearButtonState extends State<ClearButton> {
           });
         },
         child: AnimatedContainer(
-          duration: Duration(milliseconds: 100),
+          duration: const Duration(milliseconds: 100),
           width: 80,
           height: 35,
           child: Center(
             child: AnimatedDefaultTextStyle(
-              duration: Duration(milliseconds: 100),
-              child: Text("Clear"),
+              duration: const Duration(milliseconds: 100),
+              child: const Text("Clear"),
               style: TextStyle(
                 fontSize: 12,
                 fontFamily: "segoe",
                 fontWeight: FontWeight.w600,
-                color: widget.hidden? Colors.transparent : (isHovered? Colors.white : Color(0xFF72767D)),
+                color: widget.hidden? Colors.transparent : (isHovered? Colors.white : const Color(0xFF72767D)),
               ),
             ),
           ),
 
           decoration: BoxDecoration(
-            color: widget.hidden? Colors.transparent : (isHovered? Color(0xFF555555) : Color(0xFF202225)),
+            color: widget.hidden? Colors.transparent : (isHovered? const Color(0xFF555555) : const Color(0xFF202225)),
             borderRadius: const BorderRadius.all(Radius.circular(5))
           ),
         ),
